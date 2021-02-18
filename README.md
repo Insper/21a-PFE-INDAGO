@@ -36,6 +36,12 @@ sudo apt install libc6:i386 libusb-0.1-4 libgconf-2-4 libncurses5 libpython2.7 l
 
 Instaladas as dependências, o [CCS 10.2.0](https://software-dl.ti.com/ccs/esd/documents/ccs_downloads.html) deve ser instalado. Para isso, descompacte o arquivo baixado da internet, e abra o arquivo `ccs_setup_10.2.0.00009.run` que ira te guiar pela instalação.
 
+Feito isso, abra a pasta que o aplicativo foi instalado e vá em `<REPO_CCS>/ccs/install_scripts` e execute o comando
+
+```BASH
+sudo ./install_drivers.sh
+```
+
 Ao finalizar, abra o aplicativo e na aba superior clique em `Help` > `Install New Software...`
 
 Em `Work with:` Selecione `--All Available Sites--` e na barra de seleção desça até encontrar `TI Compiler Tools` e marque a opção `MSP430 Compiler Tools` cuja versão for equivalente a `4.3.8`. Aguarde a instalação e ao finalizar, reinicie o programa.
