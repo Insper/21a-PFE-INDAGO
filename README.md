@@ -1,17 +1,19 @@
 # Projeto Final de Engenharia - Indago
 
+## Sumário
+* [Integrantes](#integrantes)
+* [Professor Mentor](#professor-mentor)
+* [Intodução](#introducao)
+* [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04)
+
 ### Integrantes
 * [André Ejzenmesser](https://github.com/decoejz)
 * [Francisco Ciol Rodrigues Aveiro](https://github.com/franciol)
 * [Gustavo Gobetti Bertocco](https://github.com/GustavoGB)
 * [Manoela Cirne Lima de Campos](https://github.com/manucirne)
 
-### Professor
+### Professor Mentor
 * [Rafael Corsi](https://github.com/rafaelcorsi)
-
-## Sumário
-* [Intodução](#introducao)
-* [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04)
 
 ### Intodução
 Para o desenvolvimento do projeto, foi utilizado o projeto do WISP 5. A documentação pode ser encontrada [aqui](https://sites.google.com/uw.edu/wisp-wiki/wisp5).
