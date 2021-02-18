@@ -18,7 +18,7 @@
 ### Introdução
 Para o desenvolvimento do projeto, foi utilizado o projeto do WISP 5. A documentação pode ser encontrada [aqui](https://sites.google.com/uw.edu/wisp-wiki/wisp5).
 
-Para programar o WISP 5 é necessário a utilização Code Composer Studio ([CCS](https://software-dl.ti.com/ccs/esd/documents/ccs_downloads.html)), cuja instalação no ubuntu 20.04 esta descrita em [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04).
+Para programar o WISP 5 é necessário a utilização Code Composer Studio ([CCS](https://software-dl.ti.com/ccs/esd/documents/ccs_downloads.html)), cuja instalação no ubuntu 20.04 esta descrita em [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04). Para instalar em windows, clique em [Instalando CCS no Windows 10](#instalando-ccs-no-windows-10).
 
 ### Instalando CCS no Ubuntu 20.04
 
@@ -47,3 +47,13 @@ Ao finalizar, abra o aplicativo e na aba superior clique em `Help` > `Install Ne
 Em `Work with:` Selecione `--All Available Sites--` e na barra de seleção desça até encontrar `TI Compiler Tools` e marque a opção `MSP430 Compiler Tools` cuja versão for equivalente a `4.3.8`. Aguarde a instalação e ao finalizar, reinicie o programa.
 
 Agora ele esta pronto para usar e compilar o WISP 5.
+
+### Instalando CCS no Windows 10
+
+Antes de instalar, confirme que seu Windows 10 está atualizado, e também verifique se a arquitetura dele é x86_64(amd64). Caso seu sistema seja 32bit, use uma versão anterior ao CCS9. 
+Baixe o [CCS 10.2.0](https://software-dl.ti.com/ccs/esd/documents/ccs_downloads.html) para windows 10 e execute-o. O instalador ira te guiar pela instalação.
+
+Ao finalizar, abra o aplicativo e na aba superior clique em `Help` > `Install New Software...`
+
+Em `Work with:` Selecione `--All Available Sites--` e na barra de seleção desça até encontrar `TI Compiler Tools` e marque a opção `MSP430 Compiler Tools` cuja versão for equivalente a `4.3.8`. Aguarde a instalação e ao finalizar, reinicie o programa.
+
