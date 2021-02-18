@@ -3,7 +3,7 @@
 ## Sumário
 * [Integrantes](#integrantes)
 * [Professor Mentor](#professor-mentor)
-* [Intodução](#introducao)
+* [Introdução](#introdução)
 * [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04)
 
 ### Integrantes
@@ -15,7 +15,7 @@
 ### Professor Mentor
 * [Rafael Corsi](https://github.com/rafaelcorsi)
 
-### Intodução
+### Introdução
 Para o desenvolvimento do projeto, foi utilizado o projeto do WISP 5. A documentação pode ser encontrada [aqui](https://sites.google.com/uw.edu/wisp-wiki/wisp5).
 
 Para programar o WISP 5 é necessário a utilização Code Composer Studio ([CCS](https://software-dl.ti.com/ccs/esd/documents/ccs_downloads.html)), cuja instalação no ubuntu 20.04 esta descrita em [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04).
