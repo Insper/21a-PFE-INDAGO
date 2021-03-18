@@ -5,14 +5,14 @@
 	<deviceVariant value="Cortex M.CC1352P1F3"/>
 	<deviceFamily value="TMS470"/>
 	<deviceEndianness value="little"/>
-	<codegenToolVersion value="GNU_9.2.1:Linaro"/>
+	<codegenToolVersion value="20.2.4.LTS"/>
 	<isElfFormat value="true"/>
 	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
 	<rts value=""/>
 	<createSlaveProjects value=""/>
 	<ignoreDefaultDeviceSettings value="true"/>
 	<ignoreDefaultCCSSettings value="true"/>
-	<templateProperties value="id=empty_CC1352P1_LAUNCHXL_tirtos_gcc.projectspec.empty_CC1352P1_LAUNCHXL_tirtos_gcc,buildProfile=release,isHybrid=true"/>
-	<origin value="C:\ti\simplelink_cc13x2_26x2_sdk_4_40_04_04\examples\rtos\CC1352P1_LAUNCHXL\drivers\empty\tirtos\gcc\empty_CC1352P1_LAUNCHXL_tirtos_gcc.projectspec"/>
+	<templateProperties value="id=empty_CC1352P1_LAUNCHXL_tirtos_ccs.projectspec.empty_CC1352P1_LAUNCHXL_tirtos_ccs,buildProfile=release,isHybrid=true"/>
+	<origin value="C:\ti\simplelink_cc13x2_26x2_sdk_4_40_04_04\examples\rtos\CC1352P1_LAUNCHXL\drivers\empty\tirtos\ccs\empty_CC1352P1_LAUNCHXL_tirtos_ccs.projectspec"/>
 	<filesToOpen value=""/>
 </projectOptions>
