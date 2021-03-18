@@ -14,9 +14,9 @@ void encode_FM0(char *buffer, uint32_t size);
  */
 void fm0_encode0(void){
     GPIO_toggle(DIGITAL_TX);
-    sleep(TARI/2);
+    usleep(TARI/2); // microseconds
     GPIO_toggle(DIGITAL_TX);
-    sleep(TARI/2);
+    usleep(TARI/2); // microseconds
 }
 
 /*!
@@ -24,7 +24,7 @@ void fm0_encode0(void){
  */
 void fm0_encode1(void){
     GPIO_toggle(DIGITAL_TX);
-    sleep(TARI);
+    usleep(TARI); // microseconds
 }
 
 /*!
