@@ -38,7 +38,6 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <syscfg/ti_drivers_config.h>
 
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
@@ -48,6 +47,7 @@
 // #include <ti/drivers/Watchdog.h>
 
 /* Driver configuration */
+#include "ti_drivers_config.h"
 
 /*
  *  ======== mainThread ========
@@ -55,7 +55,7 @@
 void *mainThread(void *arg0)
 {
     /* 1 second delay */
-    uint32_t time = 6;
+    uint32_t time = 1;
 
     /* Call driver init functions */
     GPIO_init();
@@ -65,13 +65,13 @@ void *mainThread(void *arg0)
     // Watchdog_init();
 
     /* Configure the LED pin */
-    GPIO_setConfig(CONFIG_GPIO_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
 
     /* Turn on user LED */
-    GPIO_write(CONFIG_GPIO_0, CONFIG_GPIO_LED_ON);
+    GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
     while (1) {
-        usleep(time);
-        GPIO_toggle(CONFIG_GPIO_0);
+        sleep(time);
+        GPIO_toggle(CONFIG_GPIO_LED_0);
     }
 }
