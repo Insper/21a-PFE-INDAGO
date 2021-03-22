@@ -1,4 +1,2 @@
-/************************************************************************/
-/* defines                                                              */
-/************************************************************************/
-#define TARI 8 // Tari value specified by protocol documentation - Time in microseconds
+#include "config.h"
+#include "fm0_encoder.h"
