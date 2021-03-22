@@ -1,3 +1,8 @@
+/************************************************************************/
+/* defines                                                              */
+/************************************************************************/
+#define TARI 8 // Tari value specified by protocol documentation - Time in microseconds
+
 #define POLYNOMIAL 0x1D0F
 typedef uint16_t crc;
 
