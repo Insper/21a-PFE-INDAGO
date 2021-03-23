@@ -1,10 +1,14 @@
 /************************************************************************/
 /* defines                                                              */
 /************************************************************************/
+
+// FM0 enconding parameters
 #define TARI 8 // Tari value specified by protocol documentation - Time in microseconds
 
-#define POLYNOMIAL 0x1D0F
-typedef uint16_t crc;
+// CRC-16 parameters
+#define POLYNOMIAL_16        0x1021
+#define INITIAL_REMAINDER_16 0xFFFF
 
-#define WIDTH  (8 * sizeof(crc))
-#define TOPBIT (1 << (WIDTH - 1))
+// CRC-5 parameters
+#define POLYNOMIAL_5        0x29
+#define INITIAL_REMAINDER_5 0x9
