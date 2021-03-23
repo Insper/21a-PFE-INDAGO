@@ -72,7 +72,7 @@ void crc_16_ccitt_init(uint16_t polynomial) {
  * Returns:		The CRC of the message.
  *
  *********************************************************************/
-crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16	 remainder) {
+crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16 remainder) {
     uint8_t  data;
 	int      byte;
 
@@ -87,7 +87,7 @@ crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16	 remainder) 
 }
 
 
-uint8_t crc5(uint8_t const message, uint8_t  remainder, uint8_t  polynomial) {
+uint8_t crc5(uint8_t const message, uint8_t remainder, uint8_t polynomial) {
     uint8_t bit;
 
     // For each bit position in the message....
