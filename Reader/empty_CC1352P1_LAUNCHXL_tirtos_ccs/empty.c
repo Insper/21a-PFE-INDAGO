@@ -67,14 +67,11 @@ void gpioButtonFxn1(uint_least8_t index)
 
     }
 }
-<<<<<<< HEAD
 
 void wait_function(void) {
 
 }
 
-=======
->>>>>>> 52f00c09f7f1f1b83b97a30b4b2060a11fdb9387
 /*
  *  ======== mainThread ========
  */
