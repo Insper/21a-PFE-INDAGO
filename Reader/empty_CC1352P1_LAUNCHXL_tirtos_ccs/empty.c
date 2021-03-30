@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
 // #include <ti/drivers/I2C.h>
@@ -50,6 +51,22 @@
 #include "ti_drivers_config.h"
 
 
+/* IGNORAR ISSO */
+#include "fm0_decoder.c"
+
+void gpioButtonFxn1(uint_least8_t index)
+{
+    int tari = 20000;
+    int *res = fm0_decoder(DIGITAL_RX, tari);
+    int i =0;
+    int pos = 0;
+    for (i= 0; i < 32; i++){
+
+        GPIO_write(CONFIG_GPIO_LED_0,res[i]);
+        usleep(500000);
+
+    }
+}
 /*
  *  ======== mainThread ========
  */
@@ -63,14 +80,16 @@ void *mainThread(void *arg0)
     UART_Handle uart;
     UART_Params uartParams;
 
+
     /* Call driver init functions */
     GPIO_init();
     UART_init();
 
-    /* Configure the LED pin */
+
     GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(DIGITAL_RX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
 
-
+    GPIO_setCallback(DIGITAL_RX, gpioButtonFxn1);
 
     /* Create a UART with data processing off. */
    UART_Params_init(&uartParams);
@@ -85,6 +104,10 @@ void *mainThread(void *arg0)
            while (1);
    }
    UART_write(uart, echoPrompt, sizeof(echoPrompt));
+
+
+   /* Enable interrupts */
+   GPIO_enableInt(DIGITAL_RX);
 
    /* Turn on user LED */
    GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);

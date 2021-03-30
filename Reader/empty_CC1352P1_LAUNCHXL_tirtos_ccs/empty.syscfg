@@ -13,6 +13,7 @@ const GPIO1 = GPIO.addInstance();
 const RTOS  = scripting.addModule("/ti/drivers/RTOS");
 const UART  = scripting.addModule("/ti/drivers/UART", {}, false);
 const UART1 = UART.addInstance();
+const GPIO2 = GPIO.addInstance();
 
 /**
  * Write custom configuration values to the imported modules.
@@ -29,6 +30,14 @@ UART1.$hardware           = system.deviceData.board.components.XDS110UART;
 UART1.txPinInstance.$name = "CONFIG_PIN_1";
 UART1.rxPinInstance.$name = "CONFIG_PIN_2";
 
+GPIO2.$name             = "DIGITAL_RX";
+GPIO2.pull              = "Pull Down";
+GPIO2.interruptTrigger  = "Both Edges";
+GPIO2.gpioPin.$assign   = "boosterpack.23";
+GPIO2.pinInstance.$name = "CONFIG_PIN_1";
+
+
+
 /**
  * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
@@ -38,3 +47,4 @@ GPIO1.gpioPin.$suggestSolution    = "boosterpack.39";
 UART1.uart.$suggestSolution       = "UART0";
 UART1.uart.txPin.$suggestSolution = "boosterpack.4";
 UART1.uart.rxPin.$suggestSolution = "boosterpack.3";
+
