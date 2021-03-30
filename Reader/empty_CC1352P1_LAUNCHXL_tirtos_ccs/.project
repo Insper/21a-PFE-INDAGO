@@ -31,5 +31,25 @@
 			<type>1</type>
 			<locationURI>COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR/source/ti/boards/CC1352P1_LAUNCHXL/Board.html</locationURI>
 		</link>
+		<link>
+			<name>config.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/config.h</locationURI>
+		</link>
+		<link>
+			<name>fm0_decoder.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_decoder.c</locationURI>
+		</link>
+		<link>
+			<name>fm0_decoder.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_decoder.h</locationURI>
+		</link>
+		<link>
+			<name>main.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/main.h</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>
