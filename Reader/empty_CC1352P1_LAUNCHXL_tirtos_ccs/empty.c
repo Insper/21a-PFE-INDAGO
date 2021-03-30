@@ -43,11 +43,12 @@
 #include <ti/drivers/GPIO.h>
 // #include <ti/drivers/I2C.h>
 // #include <ti/drivers/SPI.h>
-// #include <ti/drivers/UART.h>
+#include <ti/drivers/UART.h>
 // #include <ti/drivers/Watchdog.h>
 
 /* Driver configuration */
 #include "ti_drivers_config.h"
+
 
 /*
  *  ======== mainThread ========
@@ -55,23 +56,42 @@
 void *mainThread(void *arg0)
 {
     /* 1 second delay */
-    uint32_t time = 1;
+    uint32_t time = 2;
+
+    const char  echoPrompt[] = "Echoing characters:\r\n";
+
+    UART_Handle uart;
+    UART_Params uartParams;
 
     /* Call driver init functions */
     GPIO_init();
-    // I2C_init();
-    // SPI_init();
-    // UART_init();
-    // Watchdog_init();
+    UART_init();
 
     /* Configure the LED pin */
     GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
 
-    /* Turn on user LED */
-    GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
+
+
+    /* Create a UART with data processing off. */
+   UART_Params_init(&uartParams);
+   uartParams.writeDataMode = UART_DATA_BINARY;
+   uartParams.readDataMode = UART_DATA_BINARY;
+   uartParams.readReturnMode = UART_RETURN_FULL;
+   uartParams.baudRate = 115200;
+
+   uart = UART_open(CONFIG_UART_0, &uartParams);
+   if (uart == NULL) {
+           /* UART_open() failed */
+           while (1);
+   }
+   UART_write(uart, echoPrompt, sizeof(echoPrompt));
+
+   /* Turn on user LED */
+   GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
     while (1) {
         sleep(time);
         GPIO_toggle(CONFIG_GPIO_LED_0);
+        UART_write(uart, echoPrompt, sizeof(echoPrompt));
     }
 }
