@@ -10,8 +10,7 @@ typedef struct {
 	unsigned char session;
 	unsigned char target;
 	unsigned char q;
-	unsigned char crc;
 } query;
-int query_command(query *query);
+int query_command(query *query, uint8_t  remainder, uint8_t  polynomial);
 
 #endif /* QUERY_H */

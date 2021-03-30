@@ -68,6 +68,10 @@ void gpioButtonFxn1(uint_least8_t index)
     }
 }
 
+void wait_function(void) {
+
+}
+
 /*
  *  ======== mainThread ========
  */
@@ -86,6 +90,7 @@ void *mainThread(void *arg0)
 
 
     GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
+    GPIO_setConfig(DIGITAL_TX, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
     GPIO_setConfig(DIGITAL_RX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
 
     GPIO_setCallback(DIGITAL_RX, gpioButtonFxn1);
@@ -95,7 +100,33 @@ void *mainThread(void *arg0)
     /* Turn on user LED */
 
     while (1) {
+    	query query;
+    	query.command = QUERY; // Command code
+    	query.dr = 0; // Radio information ignored
+		query.m = 0; // FM0
+		query.trext = 0; // Choose preamble
+		query.sel = 1; // Choose which tag to respond
+		query.session = 0; // S0
+		query.target = 0; // A
+		query.q = 0;
+    	int query_result = query_command(&query, INITIAL_REMAINDER_5, POLYNOMIAL_5);
+        fm0_encoder(query_result, 22, DIGITAL_TX, TARI);
+    	
+        wait_function();
+    	ack_command();
+    	wait_function();
+    	req_rn_command();
+    	wait_function();
+
         //sleep(time);
         //GPIO_toggle(CONFIG_GPIO_LED_0);
+    	// Inicia comunicao
+				// Envia query
+				// recebe rn16
+				// envia ack(rn16)
+    			// recebe { pc | xpc, epc }
+    			// envia req_rn(rn16)
+    			// recebe handle
+    			// envia command(handle)
     }
 }
