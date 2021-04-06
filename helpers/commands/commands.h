@@ -1,5 +1,4 @@
 // Mandatory Commands
-// Definition
 #include "query_rep.h"
 #include "ack.h"
 #include "query.h"
@@ -11,10 +10,3 @@
 #include "write.h"
 #include "kill.h"
 #include "lock.h"
-
-// Value
-#define SELECT 0b1010
-#define READ 0b11000010
-#define WRITE 0b11000011
-
-
