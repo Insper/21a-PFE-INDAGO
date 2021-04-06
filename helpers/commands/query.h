@@ -3,8 +3,8 @@
 #include "../config.h"
 #include "../crc.h"
 
-const char QUERY_COMMAND = 0b1000;
-const int QUERY_SIZE = 22;
+const unsigned char QUERY_COMMAND = 0b1000;
+const unsigned int QUERY_SIZE = 22;
 
 typedef struct {
 	unsigned char command;
