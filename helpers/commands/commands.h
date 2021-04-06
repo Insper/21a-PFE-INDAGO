@@ -13,7 +13,6 @@
 #include "lock.h"
 
 // Value
-#define QUERY_ADJUST 0b1001
 #define SELECT 0b1010
 #define NAK 0b11000000
 #define REQ_RN 0b11000001

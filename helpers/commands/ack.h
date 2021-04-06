@@ -1,7 +1,7 @@
 #ifndef ACK_H
 #define ACK_H
 
-const int ACK_COMMAND = 0b01;
+const char ACK_COMMAND = 0b01;
 const int ACK_SIZE = 18;
 
 typedef struct {
