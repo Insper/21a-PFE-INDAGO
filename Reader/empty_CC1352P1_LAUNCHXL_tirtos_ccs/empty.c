@@ -120,15 +120,8 @@ void *mainThread(void *arg0)
 
     while (1) {
     	query query;
-    	query.command = QUERY; // Command code
-    	query.dr = 0; // Radio information ignored
-		query.m = 0; // FM0
-		query.trext = 0; // Choose preamble
-		query.sel = 1; // Choose which tag to respond
-		query.session = 0; // S0
-		query.target = 0; // A
-		query.q = 0;
-    	int query_result = query_command(&query, INITIAL_REMAINDER_5, POLYNOMIAL_5);
+        query_init(QUERY, 0, 0, 0, 1, 0, 0, 0);
+    	query_build(&query);
         fm0_encoder(query_result, 22, DIGITAL_TX, TARI);
     	
         wait_function();
