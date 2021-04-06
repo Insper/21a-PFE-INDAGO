@@ -23,43 +23,31 @@ GPIO1.$hardware         = system.deviceData.board.components.LED_RED;
 GPIO1.$name             = "CONFIG_GPIO_LED_0";
 GPIO1.pinInstance.$name = "CONFIG_PIN_0";
 
-const CCFG              = scripting.addModule("/ti/devices/CCFG", {}, false);
-CCFG.ccfgTemplate.$name = "ti_devices_CCFGTemplate0";
-
-UART1.$name               = "CONFIG_UART_0";
-UART1.$hardware           = system.deviceData.board.components.XDS110UART;
-UART1.txPinInstance.$name = "CONFIG_PIN_1";
-UART1.rxPinInstance.$name = "CONFIG_PIN_2";
-
 GPIO2.$name             = "DIGITAL_RX";
 GPIO2.pull              = "Pull Down";
 GPIO2.interruptTrigger  = "Both Edges";
 GPIO2.gpioPin.$assign   = "boosterpack.23";
 GPIO2.pinInstance.$name = "CONFIG_PIN_1";
 
-<<<<<<< HEAD
 GPIO3.$name             = "DIGITAL_TX";
 GPIO3.mode              = "Output";
 GPIO3.pinInstance.$name = "CONFIG_PIN_2";
 
 const CCFG              = scripting.addModule("/ti/devices/CCFG", {}, false);
 CCFG.ccfgTemplate.$name = "ti_devices_CCFGTemplate0";
-=======
 
->>>>>>> 52f00c09f7f1f1b83b97a30b4b2060a11fdb9387
+UART1.$name               = "CONFIG_UART_0";
+UART1.$hardware           = system.deviceData.board.components.XDS110UART;
+UART1.txPinInstance.$name = "CONFIG_PIN_1_";
+UART1.rxPinInstance.$name = "CONFIG_PIN_2_";
 
 /**
  * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
  * re-solve from scratch.
  */
-<<<<<<< HEAD
-GPIO1.gpioPin.$suggestSolution = "boosterpack.39";
-GPIO3.gpioPin.$suggestSolution = "boosterpack.10";
-=======
 GPIO1.gpioPin.$suggestSolution    = "boosterpack.39";
+GPIO3.gpioPin.$suggestSolution    = "boosterpack.10";
 UART1.uart.$suggestSolution       = "UART0";
 UART1.uart.txPin.$suggestSolution = "boosterpack.4";
 UART1.uart.rxPin.$suggestSolution = "boosterpack.3";
-
->>>>>>> 52f00c09f7f1f1b83b97a30b4b2060a11fdb9387

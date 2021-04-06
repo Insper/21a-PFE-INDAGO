@@ -120,9 +120,9 @@ void *mainThread(void *arg0)
 
     while (1) {
     	query query;
-        query_init(QUERY, 0, 0, 0, 1, 0, 0, 0);
+        query_init(&query, 0, 0, 0, 1, 0, 0, 0);
     	query_build(&query);
-        fm0_encoder(query_result, 22, DIGITAL_TX, TARI);
+        fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
     	
         wait_function();
     	ack_command();
