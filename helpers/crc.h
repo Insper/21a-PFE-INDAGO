@@ -18,9 +18,9 @@
 #ifndef CRC_H
 #define CRC_H
 
-typedef uint16_t  crc16;
-void crc_16_ccitt_init(uint16_t polynomial);
-crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16	 remainder);
-uint8_t crc5(uint8_t const message, uint8_t  remainder, uint8_t  polynomial);
+typedef unsigned short  crc16;
+void crc_16_ccitt_init(unsigned short polynomial);
+crc16 crc_16_ccitt(const unsigned char message[], int nBytes, crc16	 remainder);
+unsigned char crc5(const unsigned char message, unsigned char  remainder, unsigned char  polynomial);
 
 #endif /* CRC_H */

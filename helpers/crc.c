@@ -34,10 +34,10 @@ crc16  crcTable[256];
  * Returns:		None defined.
  *
 *********************************************************************/
-void crc_16_ccitt_init(uint16_t polynomial) {
+void crc_16_ccitt_init(unsigned short polynomial) {
     crc16	 remainder;
 	int		 dividend;
-	uint8_t  bit;
+	unsigned char bit;
 
     // Compute the remainder of each possible dividend.
     for (dividend = 0; dividend < 256; ++dividend) {
@@ -73,7 +73,7 @@ void crc_16_ccitt_init(uint16_t polynomial) {
  *
  *********************************************************************/
 crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16 remainder) {
-    uint8_t  data;
+    unsigned char  data;
 	int      byte;
 
     // Divide the message by the polynomial, a byte at a time.
@@ -87,8 +87,8 @@ crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16 remainder) {
 }
 
 
-uint8_t crc5(uint8_t const message, uint8_t remainder, uint8_t polynomial) {
-    uint8_t bit;
+unsigned char crc5(unsigned char const message, unsigned char remainder, unsigned char polynomial) {
+    unsigned char bit;
 
     // For each bit position in the message....
     for (bit = 8; bit > 0; --bit)

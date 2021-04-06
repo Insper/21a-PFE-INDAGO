@@ -11,9 +11,9 @@
  *  @param      package package pointer
  */
 static void fm0_decoder(int pin_rx, int tari,int *package ) {
-    int package_pointer = 0;    // pointer of current data
-    uint32_t actual = 0;        // current data signal 
-    uint32_t last = 0;          // last data signal
+    unsigned int package_pointer = 0;    // pointer of current data
+    unsigned int actual = 0;        // current data signal
+    unsigned int last = 0;          // last data signal
 
 
     while(1){

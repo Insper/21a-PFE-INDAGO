@@ -52,17 +52,18 @@
 
 
 /* IGNORAR ISSO */
-#include "fm0_decoder.c"
+#include "main.h"
 
 void gpioButtonFxn1(uint_least8_t index)
 {
     int tari = 20000;
-    int *res = fm0_decoder(DIGITAL_RX, tari);
+    int res;
+    fm0_decoder(&res, DIGITAL_RX, tari);
     int i =0;
     int pos = 0;
     for (i= 0; i < 32; i++){
 
-        GPIO_write(CONFIG_GPIO_LED_0,res[i]);
+        //GPIO_write(CONFIG_GPIO_LED_0,res[i]);
         usleep(500000);
 
     }
@@ -124,11 +125,7 @@ void *mainThread(void *arg0)
     	query_build(&query);
         fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
     	
-        wait_function();
-    	ack_command();
-    	wait_function();
-    	req_rn_command();
-    	wait_function();
+        sleep(5);
 
         //sleep(time);
         //GPIO_toggle(CONFIG_GPIO_LED_0);

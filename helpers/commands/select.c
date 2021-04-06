@@ -1,6 +1,6 @@
 #include "select.h"
 
-void select_init(select *select, unsigned char target, unsigned char action, unsigned char mem_bank, unsigned char pointer, unsigned char length, unsigned char mask, unsigned char truncate, unsigned short crc) {
+void select_init(select_cmd *select, unsigned char target, unsigned char action, unsigned char mem_bank, unsigned char pointer, unsigned char length, unsigned char mask, unsigned char truncate, unsigned short crc) {
 	select->command = SELECT_COMMAND;
 	select->size = SELECT_SIZE;
 
@@ -15,7 +15,7 @@ void select_init(select *select, unsigned char target, unsigned char action, uns
 }
 
 
-void select_build(select *select) {
+void select_build(select_cmd *select) {
 	select->result_data = 0;
 
 	select->result_data |= (select->command << 40);
