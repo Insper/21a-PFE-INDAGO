@@ -12,7 +12,7 @@ void query_init(query *query, unsigned char dr, unsigned char m, unsigned char t
 	query->q = q;
 }
 
-void query_command(query *query) {
+void query_build(query *query) {
 	query->result_data = 0;
 
 	query->result_data |= (query->command << 13);

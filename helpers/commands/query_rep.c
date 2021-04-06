@@ -1,10 +1,15 @@
 #include "query_rep.h"
 
-int query_rep_command(query_rep *query_rep) {
-	int result = 0;
+void query_rep_init(query_rep *query_rep, unsigned char session) {
+	query_rep->command = QUERY_REP_COMMAND;
+	query_rep->size = QUERY_REP_SIZE;
 
-	result |= (query_rep->command << 2);
-	result |= query_rep->session;
+	query_rep->session = session;
+}
 
-	return result;
+void query_rep_build(query_rep *query_rep) {
+	query_rep->result_data = 0;
+
+	query_rep->result_data |= (query_rep->command << 2);
+	query_rep->result_data |= query_rep->session;
 }
