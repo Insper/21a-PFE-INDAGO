@@ -42,6 +42,7 @@
 
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
+#include <ti/drivers/Timer.h>
 // #include <ti/drivers/I2C.h>
 // #include <ti/drivers/SPI.h>
 #include <ti/drivers/UART.h>
@@ -55,6 +56,8 @@
 #include "main.h"
 
 char STATE = 0;
+
+void timerCallback(Timer_Handle myHandle, int_fast16_t status);
 
 void gpioButtonFxn1(uint_least8_t index)
 {
@@ -71,10 +74,10 @@ void gpioButtonFxn1(uint_least8_t index)
     }
 }
 
-void wait_function(void) {
 
+void timerCallback(Timer_Handle myHandle, int_fast16_t status) {
+    STATE = 0;
 }
-
 /*
  *  ======== mainThread ========
  */
@@ -91,6 +94,7 @@ void *mainThread(void *arg0)
     /* Call driver init functions */
     GPIO_init();
     UART_init();
+    Timer_init();
 
 
     GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
@@ -120,6 +124,18 @@ void *mainThread(void *arg0)
    /* Turn on user LED */
    GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
+   Timer_Handle timer0;
+   Timer_Params params;
+
+   Timer_Params_init(&params);
+   params.period = 100000;
+   params.periodUnits = Timer_PERIOD_US; // microseconds
+   params.timerMode = Timer_ONESHOT_CALLBACK;
+   params.timerCallback = timerCallback;
+   timer0 = Timer_open(CONFIG_TIMER_0, &params);
+
+
+
 
    query query;
 
@@ -129,20 +145,23 @@ void *mainThread(void *arg0)
         switch (STATE)
         {
         case 0:
+            UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
             query_init(&query, 0, 0, 0, 1, 0, 0, 0);
             query_build(&query);
             fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
-            STATE = 1;
-        ;
-        case 1:
-            sleep(5);
-            STATE = 0;
-        ;
-        default:
-            STATE = 0;
-        ;
-        }
+            if (Timer_start(timer0) == Timer_STATUS_ERROR) {
+                    /* Failed to start timer */
+                    while (1) {}
+                }
 
+            STATE = 1;
+            break;
+
+        case 1:
+            UART_write(uart, echoPrompt, sizeof(echoPrompt));
+            break;
+
+        }
 
 
     	//query query;
