@@ -1,11 +1,17 @@
 #include "req_rn.h"
 
-long req_rn_command(req_rn *req_rn) {
-	long result = 0;
+void req_rn_init(req_rn *req_rn, unsigned short rn, unsigned short crc) {
+	req_rn->command = REQ_RN_COMMAND;
+	req_rn->size = REQ_RN_SIZE;
 
-	result |= (req_rn->command << 32);
-	result |= (req_rn->rn << 16);
-	result |= req_rn->crc;
+	req_rn->rn = rn;
+	req_rn->crc = crc;
+}
 
-	return result;
+void req_rn_build(req_rn *req_rn) {
+	req_rn->result_data = 0;
+
+	req_rn->result_data |= (req_rn->command << 32);
+	req_rn->result_data |= (req_rn->rn << 16);
+	req_rn->result_data |= req_rn->crc;
 }

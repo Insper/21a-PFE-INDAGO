@@ -14,9 +14,7 @@
 
 // Value
 #define SELECT 0b1010
-#define REQ_RN 0b11000001
 #define READ 0b11000010
 #define WRITE 0b11000011
-#define KILL 0b11000100
 
 

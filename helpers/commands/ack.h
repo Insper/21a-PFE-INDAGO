@@ -10,6 +10,7 @@ typedef struct {
 	unsigned int size;
 	unsigned int result_data;
 } ack;
+
 void ack_init(ack *ack, unsigned short rn);
 void ack_build(ack *ack);
 
