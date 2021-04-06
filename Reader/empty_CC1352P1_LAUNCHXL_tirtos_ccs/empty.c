@@ -54,6 +54,8 @@
 /* IGNORAR ISSO */
 #include "main.h"
 
+char STATE = 0;
+
 void gpioButtonFxn1(uint_least8_t index)
 {
     int tari = 20000;
@@ -118,14 +120,37 @@ void *mainThread(void *arg0)
    /* Turn on user LED */
    GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
-    while (1) {
-    	query query;
-        query_init(&query, 0, 0, 0, 1, 0, 0, 0);
-    	query_build(&query);
-    	//fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
-    	fm0_encoder(10, 8, DIGITAL_TX, TARI);
 
-        sleep(5);
+   query query;
+
+
+    while (1) {
+
+        switch (STATE)
+        {
+        case 0:
+            query_init(&query, 0, 0, 0, 1, 0, 0, 0);
+            query_build(&query);
+            fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
+            STATE = 1;
+        ;
+        case 1:
+            sleep(5);
+            STATE = 0;
+        ;
+        default:
+            STATE = 0;
+        ;
+        }
+
+
+
+    	//query query;
+        //query_init(&query, 0, 0, 0, 1, 0, 0, 0);
+    	//query_build(&query);
+    	//fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
+        //fm0_encoder(10, 8, DIGITAL_TX, TARI);
+
 
         //sleep(time);
         //GPIO_toggle(CONFIG_GPIO_LED_0);
