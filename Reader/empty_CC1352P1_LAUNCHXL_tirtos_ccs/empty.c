@@ -58,7 +58,7 @@ void gpioButtonFxn1(uint_least8_t index)
 {
     int tari = 20000;
     int res;
-    fm0_decoder(&res, DIGITAL_RX, tari);
+    //fm0_decoder(&res, DIGITAL_RX, tari);
     int i =0;
     int pos = 0;
     for (i= 0; i < 32; i++){
@@ -85,7 +85,6 @@ void *mainThread(void *arg0)
 
     UART_Handle uart;
     UART_Params uartParams;
-
 
     /* Call driver init functions */
     GPIO_init();
@@ -123,8 +122,9 @@ void *mainThread(void *arg0)
     	query query;
         query_init(&query, 0, 0, 0, 1, 0, 0, 0);
     	query_build(&query);
-        fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
-    	
+    	//fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
+    	fm0_encoder(10, 8, DIGITAL_TX, TARI);
+
         sleep(5);
 
         //sleep(time);

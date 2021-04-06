@@ -1,8 +1,8 @@
 #ifndef LOCK_H
 #define LOCK_H
 
-const unsigned char LOCK_COMMAND = 0b11000101;
-const unsigned int LOCK_SIZE = 60;
+#define LOCK_COMMAND 0b11000101
+#define LOCK_SIZE 60
 
 typedef struct {
 	unsigned char command;

@@ -1,8 +1,8 @@
 #ifndef WRITE_H
 #define WRITE_H
 
-const unsigned char WRITE_COMMAND = 0b11000011;
-const unsigned int WRITE_SIZE = 58;
+#define WRITE_COMMAND 0b11000011
+#define WRITE_SIZE 58
 
 typedef struct {
 	unsigned char command;

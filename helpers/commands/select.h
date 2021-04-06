@@ -1,8 +1,8 @@
 #ifndef SELECT_H
 #define SELECT_H
 
-const unsigned char SELECT_COMMAND = 0b1010;
-const unsigned int SELECT_SIZE = 44;
+#define SELECT_COMMAND 0b1010
+#define SELECT_SIZE 44
 
 typedef struct {
 	unsigned char command;

@@ -1,8 +1,8 @@
 #ifndef NAK_H
 #define NAK_H
 
-const unsigned char NAK_COMMAND = 0b11000000;
-const unsigned int NAK_SIZE = 8;
+#define NAK_COMMAND 0b11000000
+#define NAK_SIZE 8
 
 typedef struct {
 	unsigned char command;

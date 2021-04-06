@@ -1,8 +1,8 @@
 #ifndef REQ_RN_H
 #define REQ_RN_H
 
-const unsigned char REQ_RN_COMMAND = 0b11000001;
-const unsigned int REQ_RN_SIZE = 40;
+#define REQ_RN_COMMAND 0b11000001
+#define REQ_RN_SIZE 40
 
 typedef struct {
 	unsigned char command;

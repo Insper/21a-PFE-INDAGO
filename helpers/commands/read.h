@@ -1,8 +1,8 @@
 #ifndef READ_H
 #define READ_H
 
-const unsigned char READ_COMMAND = 0b11000010;
-const unsigned int READ_SIZE = 57;
+#define READ_COMMAND 0b11000010
+#define READ_SIZE 57
 
 typedef struct {
 	unsigned char command;

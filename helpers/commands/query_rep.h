@@ -1,8 +1,8 @@
 #ifndef QUERY_REP_H
 #define QUERY_REP_H
 
-const unsigned char QUERY_REP_COMMAND = 0b00;
-const unsigned int QUERY_REP_SIZE = 4;
+#define QUERY_REP_COMMAND 0b00
+#define QUERY_REP_SIZE 4
 
 typedef struct {
 	unsigned char command;

@@ -1,8 +1,8 @@
 #ifndef ACK_H
 #define ACK_H
 
-const unsigned char ACK_COMMAND = 0b01;
-const unsigned int ACK_SIZE = 18;
+#define ACK_COMMAND 0b01
+#define ACK_SIZE 18
 
 typedef struct {
 	unsigned char command;

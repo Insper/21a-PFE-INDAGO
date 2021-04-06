@@ -1,8 +1,8 @@
 #ifndef QUERY_ADJUST_H
 #define QUERY_ADJUST_H
 
-const unsigned char QUERY_ADJUST_COMMAND = 0b1001;
-const unsigned int QUERY_ADJUST_SIZE = 9;
+#define QUERY_ADJUST_COMMAND 0b1001
+#define QUERY_ADJUST_SIZE 9
 
 typedef struct {
 	unsigned char command;

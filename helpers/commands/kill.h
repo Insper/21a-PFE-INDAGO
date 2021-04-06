@@ -1,8 +1,8 @@
 #ifndef KILL_H
 #define KILL_H
 
-const unsigned char KILL_COMMAND = 0b11000100;
-const unsigned int KILL_SIZE = 59;
+#define KILL_COMMAND 0b11000100
+#define KILL_SIZE 59
 
 typedef struct {
 	unsigned char command;
