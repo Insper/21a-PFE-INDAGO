@@ -11,10 +11,8 @@
  *  @param      package package pointer
  */
 void fm0_decoder(int pin_rx , int tari ,int *package) {
-    unsigned int actual = 0;        // current data signal
-    unsigned int last = 0;          // last data signal
+    unsigned int actual, last;        // current and last data signal
 
-    char condition_inter = 1;
     while(1){
         last = GPIO_read(pin_rx);
         usleep(tari/2); // microseconds
