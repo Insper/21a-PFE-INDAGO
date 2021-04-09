@@ -11,7 +11,6 @@ void read_init(read *read, unsigned char mem_bank, unsigned char word_ptr, unsig
 	read->crc = crc;
 }
 
-
 void read_build(read *read) {
 	read->result_data = 0;
 
