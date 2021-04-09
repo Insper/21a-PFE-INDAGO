@@ -43,48 +43,35 @@
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/Timer.h>
-// #include <ti/drivers/I2C.h>
-// #include <ti/drivers/SPI.h>
 #include <ti/drivers/UART.h>
-// #include <ti/drivers/Watchdog.h>
 
 /* Driver configuration */
 #include "ti_drivers_config.h"
-
 
 /* IGNORAR ISSO */
 #include "main.h"
 
 char STATE = 0;
+char READING = 0;
 
-void timerCallback(Timer_Handle myHandle, int_fast16_t status);
-
-void gpioButtonFxn1(uint_least8_t index)
+void rx_callback(uint_least8_t index)
 {
-    int tari = 20000;
-    int res;
-    //fm0_decoder(&res, DIGITAL_RX, tari);
-    int i =0;
-    int pos = 0;
-    for (i= 0; i < 32; i++){
-
-        //GPIO_write(CONFIG_GPIO_LED_0,res[i]);
-        usleep(500000);
-
-    }
+    READING = 1;
 }
 
 
 void timerCallback(Timer_Handle myHandle, int_fast16_t status) {
     STATE = 0;
 }
+
+
 /*
  *  ======== mainThread ========
  */
 void *mainThread(void *arg0)
 {
     /* 1 second delay */
-    uint32_t time = 2;
+    uint32_t time = 1000;
 
     const char  echoPrompt[] = "Echoing characters:\r\n";
 
@@ -96,12 +83,13 @@ void *mainThread(void *arg0)
     UART_init();
     Timer_init();
 
-
-    GPIO_setConfig(CONFIG_GPIO_LED_0, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
     GPIO_setConfig(DIGITAL_TX, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
     GPIO_setConfig(DIGITAL_RX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
 
-    GPIO_setCallback(DIGITAL_RX, gpioButtonFxn1);
+    GPIO_setCallback(DIGITAL_RX, rx_callback);
+
+    /* Enable interrupts */
+    GPIO_enableInt(DIGITAL_RX);
 
     /* Create a UART with data processing off. */
    UART_Params_init(&uartParams);
@@ -117,34 +105,25 @@ void *mainThread(void *arg0)
    }
    UART_write(uart, echoPrompt, sizeof(echoPrompt));
 
-
-   /* Enable interrupts */
-   GPIO_enableInt(DIGITAL_RX);
-
-   /* Turn on user LED */
-   GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
-
    Timer_Handle timer0;
    Timer_Params params;
 
    Timer_Params_init(&params);
-   params.period = 100000;
+   params.period = 1000000;
    params.periodUnits = Timer_PERIOD_US; // microseconds
    params.timerMode = Timer_ONESHOT_CALLBACK;
    params.timerCallback = timerCallback;
    timer0 = Timer_open(CONFIG_TIMER_0, &params);
 
-
-
-
    query query;
 
+   unsigned int query_response = 0;
 
     while (1) {
 
         switch (STATE)
         {
-        case 0:
+        case 0:   // Envia Query
             UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
             query_init(&query, 0, 0, 0, 1, 0, 0, 0);
             query_build(&query);
@@ -157,32 +136,15 @@ void *mainThread(void *arg0)
             STATE = 1;
             break;
 
-        case 1:
-            UART_write(uart, echoPrompt, sizeof(echoPrompt));
+        case 1: // Aguarda resposta
+            if(READING){
+                GPIO_disableInt(DIGITAL_RX);
+                fm0_decoder(DIGITAL_RX, TARI, &query_response);
+                READING = 0;
+                GPIO_enableInt(DIGITAL_RX);
+            }
             break;
 
         }
-
-
-    	//query query;
-        //query_init(&query, 0, 0, 0, 1, 0, 0, 0);
-    	//query_build(&query);
-    	//fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
-        //fm0_encoder(10, 8, DIGITAL_TX, TARI);
-
-
-        //sleep(time);
-        //GPIO_toggle(CONFIG_GPIO_LED_0);
-    	// Inicia comunicao
-				// Envia query
-				// recebe rn16
-				// envia ack(rn16)
-    			// recebe { pc | xpc, epc }
-    			// envia req_rn(rn16)
-    			// recebe handle
-    			// envia command(handle)
-        // sleep(time);
-        // GPIO_toggle(CONFIG_GPIO_LED_0);
-        // UART_write(uart, echoPrompt, sizeof(echoPrompt));
     }
 }
