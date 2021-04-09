@@ -1,5 +1,8 @@
 #include "fm0_decoder.h"
 
+
+#include <ti/drivers/UART.h>
+
 /************************************************************************/
 /* functions                                                            */
 /************************************************************************/
@@ -10,7 +13,7 @@
  *  @param      tari    tari time
  *  @param      package package pointer
  */
-static void fm0_decoder(int pin_rx, int tari,int *package ) {
+void fm0_decoder(int pin_rx , int tari ,int *package , UART_Handle uart) {
     unsigned int package_pointer = 0;    // pointer of current data
     unsigned int actual = 0;        // current data signal
     unsigned int last = 0;          // last data signal
@@ -26,13 +29,19 @@ static void fm0_decoder(int pin_rx, int tari,int *package ) {
             if(GPIO_read(pin_rx) == last){
                 break;
             }
+            UART_write(uart, "1", sizeof("1"));
+
             package[package_pointer] = 1;  
         }
         else{
             usleep(tari/2); // microseconds
             package[package_pointer] = 0;
+
+            UART_write(uart, "0", sizeof("0"));
         }
         package_pointer ++;
     }
+
+    UART_write(uart, "\r\n", sizeof("\r\n"));
 
 }
