@@ -20,7 +20,7 @@ void fm0_decoder(int pin_rx , int tari ,int *package) {
         usleep(tari/2); // microseconds
         actual = GPIO_read(pin_rx);
         usleep(tari/2); // microseconds
-        *package<<1;
+        *package<<=1;
         if(actual == last){            
             if(GPIO_read(pin_rx) == last){
             	break;
