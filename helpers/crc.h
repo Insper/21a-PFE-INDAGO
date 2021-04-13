@@ -18,6 +18,14 @@
 #ifndef CRC_H
 #define CRC_H
 
+// CRC-16 parameters
+#define POLYNOMIAL_16        0x1021
+#define INITIAL_REMAINDER_16 0xFFFF
+
+// CRC-5 parameters
+#define POLYNOMIAL_5        0x29
+#define INITIAL_REMAINDER_5 0x9
+
 typedef unsigned short  crc16;
 void crc_16_ccitt_init(unsigned short polynomial);
 crc16 crc_16_ccitt(const unsigned char message[], int n_bytes, crc16	 remainder);
