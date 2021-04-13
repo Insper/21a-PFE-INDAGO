@@ -19,7 +19,7 @@
 **********************************************************************/
 #include "crc.h"
 
-crc16  crcTable[256];
+crc16  crc_table[256];
 
 /*********************************************************************
  *
@@ -56,7 +56,7 @@ void crc_16_ccitt_init(unsigned short polynomial) {
         }
 
         // Store the result into the table.
-        crcTable[dividend] = remainder;
+        crc_table[dividend] = remainder;
     }
 }
 
@@ -79,7 +79,7 @@ crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16 remainder) {
     // Divide the message by the polynomial, a byte at a time.
     for (byte = 0; byte < nBytes; ++byte) {
         data = message[byte] ^ (remainder >> 8);
-  		remainder = crcTable[data] ^ (remainder << 8);
+  		remainder = crc_table[data] ^ (remainder << 8);
     }
 
     // The final remainder is the CRC.
