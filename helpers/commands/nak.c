@@ -1,5 +1,10 @@
 #include "nak.h"
 
-char nak_command(nak *nak) {
-	return nak->command;
+void nak_init(nak *nak) {
+	nak->command = NAK_COMMAND;
+	nak->size = NAK_SIZE;
+}
+
+void nak_build(nak *nak) {
+	nak->result_data = nak->command;
 }

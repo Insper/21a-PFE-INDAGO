@@ -1,14 +1,24 @@
 #include "write.h"
 
-long write_command(write *write) {
-	int result = 0;
+void write_init(write *write, unsigned char mem_bank, unsigned char word_ptr, unsigned short data, unsigned short rn, unsigned short crc) {
+	write->command = WRITE_COMMAND;
+	write->size = WRITE_SIZE;
 
-	result |= (write->command << 49);
-	result |= (write->mem_bank << 47);
-	result |= (write->word_ptr << 39);
-	result |= (write->data << 32);
-	result |= (write->rn << 16);
-	result |= write->crc;
+	write->mem_bank = mem_bank;
+	write->word_ptr = word_ptr;
+	write->data = data;
+	write->rn = rn;
+	write->crc = crc;
 
-	return result;
+}
+
+void write_build(write *write) {
+	write->result_data = 0;
+
+	write->result_data |= (write->command << 49);
+	write->result_data |= (write->mem_bank << 47);
+	write->result_data |= (write->word_ptr << 39);
+	write->result_data |= (write->data << 32);
+	write->result_data |= (write->rn << 16);
+	write->result_data |= write->crc;
 }

@@ -1,17 +1,31 @@
 #include "query.h"
 
-int query_command(query *query) {
-	int result = 0;
+void query_init(query *query, unsigned char dr, unsigned char m, unsigned char trext, unsigned char sel, unsigned char session, unsigned char target, unsigned char q) {
+	query->command = QUERY_COMMAND;
+	query->size = QUERY_SIZE;
+  query->dr = dr;
+	query->m = m;
+	query->trext = trext;
+	query->sel = sel;
+	query->session = session;
+	query->target = target;
+	query->q = q;
+}
 
-	result |= (query->command << 18);
-	result |= (query->dr << 17);
-	result |= (query->m << 15);
-	result |= (query->trext << 14);
-	result |= (query->sel << 12);
-	result |= (query->session << 10);
-	result |= (query->target << 9);
-	result |= (query->q << 5);
-	result |= query->crc;
+void query_build(query *query) {
+	query->result_data = 0;
 
-	return result;
+	query->result_data |= (query->command << 13);
+	query->result_data |= (query->dr << 12);
+	query->result_data |= (query->m << 10);
+	query->result_data |= (query->trext << 9);
+	query->result_data |= (query->sel << 7);
+	query->result_data |= (query->session << 5);
+	query->result_data |= (query->target << 4);
+	query->result_data |= query->q;
+	
+	query->crc = crc5(query->result_data, INITIAL_REMAINDER_5, POLYNOMIAL_5);
+	
+	query->result_data <<= 5;
+	query->result_data |= (query->crc);
 }

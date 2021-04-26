@@ -19,7 +19,7 @@
 **********************************************************************/
 #include "crc.h"
 
-crc16  crcTable[256];
+crc16  crc_table[256];
 
 /*********************************************************************
  *
@@ -34,10 +34,10 @@ crc16  crcTable[256];
  * Returns:		None defined.
  *
 *********************************************************************/
-void crc_16_ccitt_init(uint16_t polynomial) {
+void crc_16_ccitt_init(unsigned short polynomial) {
     crc16	 remainder;
 	int		 dividend;
-	uint8_t  bit;
+	unsigned char bit;
 
     // Compute the remainder of each possible dividend.
     for (dividend = 0; dividend < 256; ++dividend) {
@@ -56,7 +56,7 @@ void crc_16_ccitt_init(uint16_t polynomial) {
         }
 
         // Store the result into the table.
-        crcTable[dividend] = remainder;
+        crc_table[dividend] = remainder;
     }
 }
 
@@ -72,14 +72,14 @@ void crc_16_ccitt_init(uint16_t polynomial) {
  * Returns:		The CRC of the message.
  *
  *********************************************************************/
-crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16 remainder) {
-    uint8_t  data;
+crc16 crc_16_ccitt(unsigned char const message[], int n_bytes, crc16 remainder) {
+    unsigned char  data;
 	int      byte;
 
     // Divide the message by the polynomial, a byte at a time.
-    for (byte = 0; byte < nBytes; ++byte) {
+    for (byte = 0; byte < n_bytes; ++byte) {
         data = message[byte] ^ (remainder >> 8);
-  		remainder = crcTable[data] ^ (remainder << 8);
+  		remainder = crc_table[data] ^ (remainder << 8);
     }
 
     // The final remainder is the CRC.
@@ -87,8 +87,8 @@ crc16 crc_16_ccitt(unsigned char const message[], int nBytes, crc16 remainder) {
 }
 
 
-uint8_t crc5(uint8_t const message, uint8_t remainder, uint8_t polynomial) {
-    uint8_t bit;
+unsigned char crc5(unsigned char const message, unsigned char remainder, unsigned char polynomial) {
+    unsigned char bit;
 
     // For each bit position in the message....
     for (bit = 8; bit > 0; --bit)

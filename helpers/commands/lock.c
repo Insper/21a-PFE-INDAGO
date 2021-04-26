@@ -1,12 +1,19 @@
 #include "lock.h"
 
-long lock_command(lock *lock) {
-	long result = 0;
+void lock_init(lock *lock, unsigned int payload, unsigned short rn, unsigned short crc) {
+	lock->command = LOCK_COMMAND;
+	lock->size = LOCK_SIZE;
+	
+	lock->payload = payload;
+	lock->rn = rn;
+	lock->crc = crc;
+}
 
-	result |= (lock->command << 52);
-	result |= (lock->payload << 32);
-	result |= (lock->rn << 16);
-	result |= lock->crc;
+void lock_command(lock *lock) {
+	lock->result_data = 0;
 
-	return result;
+	lock->result_data |= (lock->command << 52);
+	lock->result_data |= (lock->payload << 32);
+	lock->result_data |= (lock->rn << 16);
+	lock->result_data |= lock->crc;
 }

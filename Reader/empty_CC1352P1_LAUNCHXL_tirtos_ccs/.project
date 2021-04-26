@@ -32,9 +32,34 @@
 			<locationURI>COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR/source/ti/boards/CC1352P1_LAUNCHXL/Board.html</locationURI>
 		</link>
 		<link>
+			<name>ack.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/ack.c</locationURI>
+		</link>
+		<link>
+			<name>ack.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/ack.h</locationURI>
+		</link>
+		<link>
+			<name>commands.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/commands.h</locationURI>
+		</link>
+		<link>
 			<name>config.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/config.h</locationURI>
+		</link>
+		<link>
+			<name>crc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/crc.c</locationURI>
+		</link>
+		<link>
+			<name>crc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/crc.h</locationURI>
 		</link>
 		<link>
 			<name>fm0_decoder.c</name>
@@ -47,9 +72,119 @@
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_decoder.h</locationURI>
 		</link>
 		<link>
+			<name>fm0_encoder.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_encoder.c</locationURI>
+		</link>
+		<link>
+			<name>fm0_encoder.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_encoder.h</locationURI>
+		</link>
+		<link>
+			<name>kill.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/kill.c</locationURI>
+		</link>
+		<link>
+			<name>kill.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/kill.h</locationURI>
+		</link>
+		<link>
+			<name>lock.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/lock.c</locationURI>
+		</link>
+		<link>
+			<name>lock.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/lock.h</locationURI>
+		</link>
+		<link>
 			<name>main.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/main.h</locationURI>
+		</link>
+		<link>
+			<name>nak.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/nak.c</locationURI>
+		</link>
+		<link>
+			<name>nak.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/nak.h</locationURI>
+		</link>
+		<link>
+			<name>query.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/query.c</locationURI>
+		</link>
+		<link>
+			<name>query.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/query.h</locationURI>
+		</link>
+		<link>
+			<name>query_adjust.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/query_adjust.c</locationURI>
+		</link>
+		<link>
+			<name>query_adjust.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/query_adjust.h</locationURI>
+		</link>
+		<link>
+			<name>query_rep.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/query_rep.c</locationURI>
+		</link>
+		<link>
+			<name>query_rep.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/query_rep.h</locationURI>
+		</link>
+		<link>
+			<name>read.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/read.c</locationURI>
+		</link>
+		<link>
+			<name>read.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/read.h</locationURI>
+		</link>
+		<link>
+			<name>req_rn.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/req_rn.c</locationURI>
+		</link>
+		<link>
+			<name>req_rn.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/req_rn.h</locationURI>
+		</link>
+		<link>
+			<name>select.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/select.c</locationURI>
+		</link>
+		<link>
+			<name>select.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/select.h</locationURI>
+		</link>
+		<link>
+			<name>write.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/write.c</locationURI>
+		</link>
+		<link>
+			<name>write.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/write.h</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
