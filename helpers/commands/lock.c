@@ -9,7 +9,7 @@ void lock_init(lock *lock, unsigned int payload, unsigned short rn, unsigned sho
 	lock->crc = crc;
 }
 
-void lock_command(lock *lock) {
+void lock_build(lock *lock) {
 	lock->result_data = 0;
 
 	lock->result_data |= (lock->command << 52);
