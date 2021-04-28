@@ -1,9 +1,8 @@
-#ifdef MSP432
-#ifndef MSP432_H
+#if defined MSP432 && !defined MSP432_H
 #define MSP432_H
 
-void _toggle_pin(int pin);
-void _usleep(int time);
+void _GPIO_toggle(unsigned short pin, unsigned char port);
+void _usleep(unsigned int time);
+unsigned int _GPIO_read(unsigned short pin, unsigned char port);
 
-#endif /* MSP432_H */
-#endif /* MSP432 */
+#endif /* MSP432 && MSP432_H */

@@ -1,7 +1,7 @@
 #include "fm0_encoder.h"
 
 
-// _toggle_pin(pin)
+// GPIO_toggle(pin)
 // _usleep(tempo)
 
 /************************************************************************/
@@ -14,9 +14,9 @@
  *  @param      tari     tari value to properly send the signal
  */
 static void fm0_encode0(int pin_tx, int tari){
-    _toggle_pin(pin_tx);
+    _GPIO_toggle(pin_tx, 0);
     _usleep(tari/2); // microseconds
-    _toggle_pin(pin_tx);
+    _GPIO_toggle(pin_tx, 0);
     _usleep(tari/2); // microseconds
 }
 
@@ -27,7 +27,7 @@ static void fm0_encode0(int pin_tx, int tari){
  *  @param      tari     tari value to properly send the signal
  */
 static void fm0_encode1(int pin_tx, int tari){
-    _toggle_pin(pin_tx);
+    _GPIO_toggle(pin_tx, 0);
     _usleep(tari); // microseconds
 }
 
