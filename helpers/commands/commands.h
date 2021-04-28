@@ -10,3 +10,4 @@
 #include "write.h"
 #include "kill.h"
 #include "lock.h"
+#include "rn16.h"
