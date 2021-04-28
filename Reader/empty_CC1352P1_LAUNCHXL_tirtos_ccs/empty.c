@@ -34,6 +34,7 @@
  *  ======== empty.c ========
  */
 
+
 /* For usleep() */
 #include <unistd.h>
 #include <stdint.h>
@@ -116,7 +117,6 @@ void *mainThread(void *arg0)
    timer0 = Timer_open(CONFIG_TIMER_0, &params);
 
    query query;
-
    unsigned int query_response = 0;
 
     while (1) {
