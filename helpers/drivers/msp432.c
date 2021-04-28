@@ -1,3 +1,5 @@
+#include "msp432.h"
+
 void _GPIO_toggle(unsigned short pin, unsigned char port) {
   GPIO_toggle(pin);
 }
