@@ -40,11 +40,13 @@
  * E. Chen
  *
  ******************************************************************************/
+#define MSP430
 
 #include "main.h"
 #include "LiveTempMode.h"
 #include "FRAMLogMode.h"
 #include "driverlib.h"
+#include "main_includes.h"
 
 uint8_t RXData = 0;                               // UART Receive byte
 int mode = 0;                                     // mode selection variable

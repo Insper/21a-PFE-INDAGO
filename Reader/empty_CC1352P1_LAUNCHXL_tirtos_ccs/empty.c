@@ -34,7 +34,7 @@
  *  ======== empty.c ========
  */
 
-
+#define MSP432
 /* For usleep() */
 #include <unistd.h>
 #include <stdint.h>
@@ -50,7 +50,7 @@
 #include "ti_drivers_config.h"
 
 /* IGNORAR ISSO */
-#include "main.h"
+#include "main_includes.h"
 
 char STATE = 0;
 char READING = 0;

@@ -102,9 +102,9 @@
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/commands/lock.h</locationURI>
 		</link>
 		<link>
-			<name>main.h</name>
+			<name>main_includes.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/helpers/main.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/main_includes.h</locationURI>
 		</link>
 		<link>
 			<name>nak.c</name>
