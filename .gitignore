@@ -41,3 +41,9 @@ Release/
 .launches/
 .metadata/
 RemoteSystemsTempFiles/
+
+
+Reader/empty_CC1352P1_LAUNCHXL_tirtos_ccs/.cproject
+Reader/tirtos_builds_cc13x2_cc26x2_release_ccs/src/makefile.libs
+Reader/tirtos_builds_cc13x2_cc26x2_release_ccs/src/sysbios/makefile
+Reader/tirtos_builds_cc13x2_cc26x2_release_ccs/src/sysbios/rom_sysbios.aem4f
