@@ -62,6 +62,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/crc.h</locationURI>
 		</link>
 		<link>
+			<name>drivers.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/drivers/drivers.h</locationURI>
+		</link>
+		<link>
 			<name>fm0_decoder.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_decoder.c</locationURI>
@@ -105,6 +110,16 @@
 			<name>main_includes.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/main_includes.h</locationURI>
+		</link>
+		<link>
+			<name>msp432.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/drivers/msp432.c</locationURI>
+		</link>
+		<link>
+			<name>msp432.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/helpers/drivers/msp432.h</locationURI>
 		</link>
 		<link>
 			<name>nak.c</name>
