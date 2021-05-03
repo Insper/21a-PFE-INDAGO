@@ -4,6 +4,7 @@
 
 void _GPIO_toggle(unsigned short pin, unsigned char port);
 void _usleep(unsigned int time);
+inline void _usleep_tari(void);
 unsigned int _GPIO_read(unsigned short pin, unsigned char port);
 
 #endif /* MSP430_H */

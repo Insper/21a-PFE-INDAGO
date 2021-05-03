@@ -5,7 +5,21 @@ void _GPIO_toggle(unsigned short pin, unsigned char port) {
 }
 
 void _usleep(unsigned int time) {
+  if(time >= 1000){
+      __delay_cycles(7970);
+  }
+  else {
+      __delay_cycles(3937);
+  }
+}
+
+inline void _usleep_tari(void) {
   // TODO: Criar nossa propria funcao
+    asm(" NOP");
+    asm(" NOP");
+    asm(" NOP");
+    asm(" NOP");
+    asm(" NOP");
 }
 
 unsigned int _GPIO_read(unsigned short pin, unsigned char port) {
