@@ -110,7 +110,7 @@ void *mainThread(void *arg0)
    Timer_Params params;
 
    Timer_Params_init(&params);
-   params.period = 1000000;
+   params.period = 300000;
    params.periodUnits = Timer_PERIOD_US; // microseconds
    params.timerMode = Timer_ONESHOT_CALLBACK;
    params.timerCallback = timerCallback;
