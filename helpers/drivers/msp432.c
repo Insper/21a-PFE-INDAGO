@@ -5,7 +5,7 @@ void _GPIO_toggle(unsigned short pin, unsigned char port) {
 }
 
 void _usleep(unsigned int time) {
-  usleep(time);
+  usleep(time-100);
 }
 
 unsigned int _GPIO_read(unsigned short pin, unsigned char port) {
