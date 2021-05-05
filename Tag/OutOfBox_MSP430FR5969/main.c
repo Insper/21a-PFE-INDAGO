@@ -40,11 +40,13 @@
  * E. Chen
  *
  ******************************************************************************/
+#define MSP430
 
 #include "main.h"
 #include "LiveTempMode.h"
 #include "FRAMLogMode.h"
 #include "driverlib.h"
+#include "main_includes.h"
 
 uint8_t RXData = 0;                               // UART Receive byte
 int mode = 0;                                     // mode selection variable
@@ -55,6 +57,9 @@ Calendar calendar;                                // Calendar used for RTC
 #pragma location = 0x9000
 __no_init uint16_t dataArray[12289];
 #endif
+
+
+int hora_da_leitura = 0;
 
 //-----------------------------------------------------------------------------
 int _system_pre_init(void)
@@ -104,7 +109,7 @@ int main(void) {
 
         	// Light up LED1 to indicate Exit from FRAM mode
         	Init_GPIO();
-        	GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN6);
+        	GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN2);
         	__delay_cycles(600000);
         }
         else
@@ -124,7 +129,7 @@ int main(void) {
     	for (i=0;i<10;i++)
     	{
             GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            GPIO_toggleOutputOnPin(GPIO_PORT_P4, GPIO_PIN6);
+            GPIO_toggleOutputOnPin(GPIO_PORT_P4, GPIO_PIN2);
             __delay_cycles(200000);
     	}
     }
@@ -134,11 +139,21 @@ int main(void) {
     Init_Clock();
     Init_UART();
 
-
+    unsigned int query_response = 0;
     while(1) {
-        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        char str[] = "teste ";
-        send_uart(&str);
+        //char str[] = "teste ";
+        //send_uart(&str);
+        //GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+
+        if (hora_da_leitura) {
+            GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
+            fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
+            //__delay_cycles(1000000);
+            fm0_encoder(0b1010, 4, TARI, GPIO_PIN6, GPIO_PORT_P2);
+            hora_da_leitura=0;
+            GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+            GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+        }
     }
 }
 
@@ -149,18 +164,20 @@ void Init_GPIO()
 {
     // Set all GPIO pins to output low for low power
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN6);
+    //GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN2);
+    GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN6);
 
 
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
-    GPIO_setAsOutputPin(GPIO_PORT_P4, GPIO_PIN6);
+    GPIO_setAsInputPin(GPIO_PORT_P4, GPIO_PIN2);
+    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN6);
 
 	// Configure P2.0 - UCA0TXD and P2.1 - UCA0RXD
 	GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0);
 	GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0);
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P2, GPIO_PIN1, GPIO_SECONDARY_MODULE_FUNCTION);
 
-    // Set PJ.4 and PJ.5 as Primary Module Function Input, LFXT.
+    // Saet PJ.4 nd PJ.5 as Primary Module Function Input, LFXT.
     GPIO_setAsPeripheralModuleFunctionInputPin(
            GPIO_PORT_PJ,
            GPIO_PIN4 + GPIO_PIN5,
@@ -170,6 +187,15 @@ void Init_GPIO()
     // Disable the GPIO power-on default high-impedance mode
     // to activate previously configured port settings
     PMM_unlockLPM5();
+
+
+    GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2, GPIO_LOW_TO_HIGH_TRANSITION);
+    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P4, GPIO_PIN2);
+    GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+
+    // Enable global interrupt
+    __enable_interrupt();
 }
 
 /*
@@ -265,4 +291,17 @@ __interrupt void USCI_A0_ISR(void)
         case USCI_UART_UCSTTIFG: break;
         case USCI_UART_UCTXCPTIFG: break;
     }
+}
+
+
+/*
+ * PIN interrupt to read content
+ */
+#pragma vector = PORT4_VECTOR
+__interrupt void PIN_RX_ISR(void)
+{
+    GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    hora_da_leitura = 1;
+    GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+
 }

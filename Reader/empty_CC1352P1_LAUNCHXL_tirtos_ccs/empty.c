@@ -34,7 +34,7 @@
  *  ======== empty.c ========
  */
 
-
+#define MSP432
 /* For usleep() */
 #include <unistd.h>
 #include <stdint.h>
@@ -50,7 +50,7 @@
 #include "ti_drivers_config.h"
 
 /* IGNORAR ISSO */
-#include "main.h"
+#include "main_includes.h"
 
 char STATE = 0;
 char READING = 0;
@@ -110,7 +110,7 @@ void *mainThread(void *arg0)
    Timer_Params params;
 
    Timer_Params_init(&params);
-   params.period = 1000000;
+   params.period = 300000;
    params.periodUnits = Timer_PERIOD_US; // microseconds
    params.timerMode = Timer_ONESHOT_CALLBACK;
    params.timerCallback = timerCallback;
@@ -127,7 +127,7 @@ void *mainThread(void *arg0)
             UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
             query_init(&query, 0, 0, 0, 1, 0, 0, 0);
             query_build(&query);
-            fm0_encoder(query.result_data, query.size, DIGITAL_TX, TARI);
+            fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
             if (Timer_start(timer0) == Timer_STATUS_ERROR) {
                     /* Failed to start timer */
                     while (1) {}
@@ -139,7 +139,7 @@ void *mainThread(void *arg0)
         case 1: // Aguarda resposta
             if(READING){
                 GPIO_disableInt(DIGITAL_RX);
-                fm0_decoder(DIGITAL_RX, TARI, &query_response);
+                fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
                 READING = 0;
                 GPIO_enableInt(DIGITAL_RX);
             }
