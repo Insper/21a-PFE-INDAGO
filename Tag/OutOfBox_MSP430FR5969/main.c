@@ -149,7 +149,7 @@ int main(void) {
             GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
             fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
             //__delay_cycles(1000000);
-            fm0_encoder(0b1010, 4, TARI, GPIO_PIN6, GPIO_PORT_P2);
+            fm0_encoder(query_response, 22, TARI, GPIO_PIN6, GPIO_PORT_P2);
             hora_da_leitura=0;
             GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
             GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
@@ -190,6 +190,7 @@ void Init_GPIO()
 
 
     GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2, GPIO_LOW_TO_HIGH_TRANSITION);
+    GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2, GPIO_HIGH_TO_LOW_TRANSITION);
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);

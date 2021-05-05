@@ -139,7 +139,9 @@ void *mainThread(void *arg0)
         case 1: // Aguarda resposta
             if(READING){
                 GPIO_disableInt(DIGITAL_RX);
+                Timer_stop(timer0);
                 fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
+                UART_write(uart, query_response, sizeof(query_response));
                 READING = 0;
                 GPIO_enableInt(DIGITAL_RX);
             }
