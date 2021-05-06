@@ -4,11 +4,12 @@
 #define ACK_COMMAND 0b01
 #define ACK_SIZE 18
 
-typedef struct {
-	unsigned char command;
-	unsigned short rn;
-	unsigned int size;
-	unsigned int result_data;
+typedef struct
+{
+    unsigned char command;
+    unsigned short rn;
+    unsigned int size;
+    unsigned int result_data;
 } ack;
 
 void ack_init(ack *ack, unsigned short rn);

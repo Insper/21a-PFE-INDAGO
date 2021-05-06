@@ -10,18 +10,23 @@
  *  @param      tari    tari time
  *  @param      package package pointer
  */
-void fm0_decoder(int tari, int *package, unsigned short pin_rx, unsigned char port_rx) {
+void fm0_decoder(int tari, int *package, unsigned short pin_rx,
+                 unsigned char port_rx)
+{
     unsigned int actual, last;        // current and last data signal
 
-    while(1){
+    while (1)
+    {
         last = _GPIO_read(pin_rx, port_rx);
-        _usleep(tari/2); // microseconds
+        _usleep(tari / 2); // microseconds
         actual = _GPIO_read(pin_rx, port_rx);
-        _usleep(tari/2); // microseconds
-        *package<<=1;
-        if(actual == last){            
-            if(_GPIO_read(pin_rx, port_rx) == last){
-            	break;
+        _usleep(tari / 2); // microseconds
+        *package <<= 1;
+        if (actual == last)
+        {
+            if (_GPIO_read(pin_rx, port_rx) == last)
+            {
+                break;
             }
             *package |= 1;
         }

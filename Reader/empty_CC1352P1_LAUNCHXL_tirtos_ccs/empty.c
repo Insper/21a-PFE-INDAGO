@@ -40,7 +40,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/Timer.h>
@@ -60,21 +59,20 @@ void rx_callback(uint_least8_t index)
     READING = 1;
 }
 
-
-void timerCallback(Timer_Handle myHandle, int_fast16_t status) {
+void timerCallback(Timer_Handle myHandle, int_fast16_t status)
+{
     STATE = 0;
 }
-
 
 /*
  *  ======== mainThread ========
  */
-void *mainThread(void *arg0)
+void* mainThread(void *arg0)
 {
     /* 1 second delay */
     uint32_t time = 1000;
 
-    const char  echoPrompt[] = "Echoing characters:\r\n";
+    const char echoPrompt[] = "Echoing characters:\r\n";
 
     UART_Handle uart;
     UART_Params uartParams;
@@ -90,36 +88,41 @@ void *mainThread(void *arg0)
     GPIO_setCallback(DIGITAL_RX, rx_callback);
 
     /* Enable interrupts */
-    GPIO_enableInt(DIGITAL_RX);
+    GPIO_enableInt (DIGITAL_RX);
 
     /* Create a UART with data processing off. */
-   UART_Params_init(&uartParams);
-   uartParams.writeDataMode = UART_DATA_BINARY;
-   uartParams.readDataMode = UART_DATA_BINARY;
-   uartParams.readReturnMode = UART_RETURN_FULL;
-   uartParams.baudRate = 115200;
+    UART_Params_init(&uartParams);
+    uartParams.writeDataMode = UART_DATA_BINARY;
+    uartParams.readDataMode = UART_DATA_BINARY;
+    uartParams.readReturnMode = UART_RETURN_FULL;
+    uartParams.baudRate = 115200;
 
-   uart = UART_open(CONFIG_UART_0, &uartParams);
-   if (uart == NULL) {
-           /* UART_open() failed */
-           while (1);
-   }
-   UART_write(uart, echoPrompt, sizeof(echoPrompt));
+    uart = UART_open(CONFIG_UART_0, &uartParams);
+    if (uart == NULL)
+    {
+        /* UART_open() failed */
+        while (1)
+            ;
+    }
+    UART_write(uart, echoPrompt, sizeof(echoPrompt));
 
-   Timer_Handle timer0;
-   Timer_Params params;
+    Timer_Handle timer0;
+    Timer_Params params;
 
-   Timer_Params_init(&params);
-   params.period = 300000;
-   params.periodUnits = Timer_PERIOD_US; // microseconds
-   params.timerMode = Timer_ONESHOT_CALLBACK;
-   params.timerCallback = timerCallback;
-   timer0 = Timer_open(CONFIG_TIMER_0, &params);
-   sleep(1);
-   query query;
-   unsigned int query_response = 0;
+    Timer_Params_init(&params);
+    params.period = 300000;
+    params.periodUnits = Timer_PERIOD_US; // microseconds
+    params.timerMode = Timer_ONESHOT_CALLBACK;
+    params.timerCallback = timerCallback;
+    timer0 = Timer_open(CONFIG_TIMER_0, &params);
+    sleep(1);
+    query query;
+    unsigned int query_response = 0;
 
-    while (1) {
+    sleep(2);
+
+    while (1)
+    {
         UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
         switch (STATE)
         {
@@ -136,7 +139,8 @@ void *mainThread(void *arg0)
             break;
 
         case 1: // Aguarda resposta
-            if(READING){
+            if (READING)
+            {
                 GPIO_disableInt(DIGITAL_RX);
                 Timer_stop(timer0);
                 fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
@@ -145,7 +149,8 @@ void *mainThread(void *arg0)
                 GPIO_enableInt(DIGITAL_RX);
                 STATE = 2;
             }
-            else{
+            else
+            {
                 UART_write(uart, "NOPS\r\n", sizeof("NOPS\r\n"));
             }
             break;
@@ -153,10 +158,13 @@ void *mainThread(void *arg0)
             UART_write(uart, "Sleep\r\n", sizeof("Sleep\r\n"));
 
             sleep(2);
-            if (Timer_start(timer0) == Timer_STATUS_ERROR) {
+            if (Timer_start(timer0) == Timer_STATUS_ERROR)
+            {
                 /* Failed to start timer */
-                while (1) {
-                    UART_write(uart, "DEU RUIM 2\r\n", sizeof("DEU RUIM 2\r\n"));
+                while (1)
+                {
+                    UART_write(uart, "DEU RUIM 2\r\n",
+                               sizeof("DEU RUIM 2\r\n"));
                 }
             }
             break;
