@@ -115,23 +115,22 @@ void *mainThread(void *arg0)
    params.timerMode = Timer_ONESHOT_CALLBACK;
    params.timerCallback = timerCallback;
    timer0 = Timer_open(CONFIG_TIMER_0, &params);
-
+   sleep(1);
    query query;
    unsigned int query_response = 0;
 
     while (1) {
-
+        UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
         switch (STATE)
         {
         case 0:   // Envia Query
-            UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
+
             query_init(&query, 0, 0, 0, 1, 0, 0, 0);
             query_build(&query);
-            fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
-            if (Timer_start(timer0) == Timer_STATUS_ERROR) {
-                    /* Failed to start timer */
-                    while (1) {}
-                }
+
+            //fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
+            fm0_encoder(0b1001, 4, TARI, DIGITAL_TX, 0);
+            Timer_start(timer0);
 
             STATE = 1;
             break;
@@ -141,9 +140,24 @@ void *mainThread(void *arg0)
                 GPIO_disableInt(DIGITAL_RX);
                 Timer_stop(timer0);
                 fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
-                UART_write(uart, query_response, sizeof(query_response));
+                UART_write(uart, "READ\r\n", sizeof("READ\r\n"));
                 READING = 0;
                 GPIO_enableInt(DIGITAL_RX);
+                STATE = 2;
+            }
+            else{
+                UART_write(uart, "NOPS\r\n", sizeof("NOPS\r\n"));
+            }
+            break;
+        case 2:
+            UART_write(uart, "Sleep\r\n", sizeof("Sleep\r\n"));
+
+            sleep(2);
+            if (Timer_start(timer0) == Timer_STATUS_ERROR) {
+                /* Failed to start timer */
+                while (1) {
+                    UART_write(uart, "DEU RUIM 2\r\n", sizeof("DEU RUIM 2\r\n"));
+                }
             }
             break;
 

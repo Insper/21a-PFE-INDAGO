@@ -47,6 +47,8 @@
 #include "FRAMLogMode.h"
 #include "driverlib.h"
 #include "main_includes.h"
+#include <msp430.h>
+
 
 uint8_t RXData = 0;                               // UART Receive byte
 int mode = 0;                                     // mode selection variable
@@ -90,6 +92,19 @@ void send_uart(char* str) {
 
                 GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0);
                 GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0);
+}
+
+
+void send_bits_uart(int package, int size){
+    int i;
+    for (i=(size-1); i>=0; i--) {
+        if ((package >> i) & 1) {
+            send_uart("1");
+        } else {
+            send_uart("0");
+        }
+    }
+    send_uart("\r\n");
 }
 /*
  * main.c
@@ -139,6 +154,9 @@ int main(void) {
     Init_Clock();
     Init_UART();
 
+
+
+
     unsigned int query_response = 0;
     while(1) {
         //char str[] = "teste ";
@@ -148,11 +166,15 @@ int main(void) {
         if (hora_da_leitura) {
             GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
             fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
-            //__delay_cycles(1000000);
-            fm0_encoder(query_response, 22, TARI, GPIO_PIN6, GPIO_PORT_P2);
+
+
+            fm0_encoder(query_response, 4, TARI, GPIO_PIN6, GPIO_PORT_P2);
+            send_bits_uart(query_response,4);
             hora_da_leitura=0;
             GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+            GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
             GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+            GPIO_enableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
         }
     }
 }
@@ -170,6 +192,7 @@ void Init_GPIO()
 
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
     GPIO_setAsInputPin(GPIO_PORT_P4, GPIO_PIN2);
+    GPIO_setAsInputPin(GPIO_PORT_P2, GPIO_PIN5);
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN6);
 
 	// Configure P2.0 - UCA0TXD and P2.1 - UCA0RXD
@@ -190,10 +213,21 @@ void Init_GPIO()
 
 
     GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2, GPIO_LOW_TO_HIGH_TRANSITION);
-    GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2, GPIO_HIGH_TO_LOW_TRANSITION);
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+
+    GPIO_selectInterruptEdge(GPIO_PORT_P2, GPIO_PIN5, GPIO_HIGH_TO_LOW_TRANSITION);
+    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P2, GPIO_PIN5);
+    GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
+    GPIO_enableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
+
+    // initialize Timer0_A
+    TA0CCR0 = 62500;  // set up terminal count
+    TA0CTL = TASSEL_2 + ID_3 + MC_1; // configure and start timer
+
+    // enable interrupts
+    TA0CCTL0_bit.CCIE = 1;   // enable timer interrupts
 
     // Enable global interrupt
     __enable_interrupt();
@@ -302,7 +336,30 @@ __interrupt void USCI_A0_ISR(void)
 __interrupt void PIN_RX_ISR(void)
 {
     GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    GPIO_disableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
     hora_da_leitura = 1;
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
 
+}
+
+/*
+ * PIN interrupt to read content
+ */
+#pragma vector = PORT2_VECTOR
+__interrupt void PIN_RX2_ISR(void)
+{
+    GPIO_disableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
+    GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    hora_da_leitura = 1;
+    GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
+    GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+
+}
+
+
+#pragma vector = TIMER0_A0_VECTOR
+__interrupt void myTimerISR(void)
+{
+    GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
 }

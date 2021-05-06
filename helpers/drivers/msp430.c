@@ -6,10 +6,10 @@ void _GPIO_toggle(unsigned short pin, unsigned char port) {
 
 void _usleep(unsigned int time) {
   if(time >= 1000){
-      __delay_cycles(7970);
+      __delay_cycles(7979);
   }
   else {
-      __delay_cycles(3937);
+      __delay_cycles(3837);
   }
 }
 
