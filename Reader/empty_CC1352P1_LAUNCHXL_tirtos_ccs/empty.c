@@ -141,12 +141,12 @@ void* mainThread(void *arg0)
         case 1: // Aguarda resposta
             if (READING)
             {
-                GPIO_disableInt(DIGITAL_RX);
-                Timer_stop(timer0);
-                fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
-                UART_write(uart, "READ\r\n", sizeof("READ\r\n"));
+                //GPIO_disableInt(DIGITAL_RX);
+                //Timer_stop(timer0);
+                //fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
+                //UART_write(uart, "READ\r\n", sizeof("READ\r\n"));
                 READING = 0;
-                GPIO_enableInt(DIGITAL_RX);
+                //GPIO_enableInt(DIGITAL_RX);
                 STATE = 2;
             }
             else
