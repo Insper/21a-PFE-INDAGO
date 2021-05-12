@@ -11,6 +11,7 @@
 const GPIO   = scripting.addModule("/ti/drivers/GPIO");
 const GPIO1  = GPIO.addInstance();
 const GPIO2  = GPIO.addInstance();
+const GPIO3  = GPIO.addInstance();
 const RTOS   = scripting.addModule("/ti/drivers/RTOS");
 const Timer  = scripting.addModule("/ti/drivers/Timer", {}, false);
 const Timer1 = Timer.addInstance();
@@ -29,6 +30,11 @@ GPIO1.pinInstance.$name = "CONFIG_PIN_1";
 GPIO2.$name             = "DIGITAL_TX";
 GPIO2.mode              = "Output";
 GPIO2.pinInstance.$name = "CONFIG_PIN_2";
+
+GPIO3.mode              = "Output";
+GPIO3.$name             = "HAMBURGER_PIN";
+GPIO3.gpioPin.$assign   = "boosterpack.9";
+GPIO3.pinInstance.$name = "CONFIG_PIN_0";
 
 const CCFG              = scripting.addModule("/ti/devices/CCFG", {}, false);
 CCFG.ccfgTemplate.$name = "ti_devices_CCFGTemplate0";

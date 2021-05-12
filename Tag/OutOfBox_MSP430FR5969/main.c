@@ -167,19 +167,21 @@ int main(void)
         //char str[] = "teste ";
         //send_uart(&str);
         //GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-
-        if (hora_da_leitura)
-        {
-            GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
-            //__delay_cycles(1000000);
-            fm0_encoder(random_number, 16, TARI, GPIO_PIN6, GPIO_PORT_P2);
-            hora_da_leitura = 0;
-            GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-            GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-            GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-            GPIO_enableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-        }
+        __delay_cycles(100000000);
+        fm0_encoder(0b1, 1, TARI, GPIO_PIN6, GPIO_PORT_P2);
+        __delay_cycles(2000000000000000);
+        // if (hora_da_leitura)
+        // {
+        //     GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
+        //     fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
+        //     //__delay_cycles(1000000);
+        //     fm0_encoder(random_number, 16, TARI, GPIO_PIN6, GPIO_PORT_P2);
+        //     hora_da_leitura = 0;
+        //     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+        //     GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
+        //     GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+        //     GPIO_enableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
+        // }
     }
 }
 
