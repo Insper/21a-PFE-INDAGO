@@ -40,7 +40,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-
 /* Driver Header files */
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/Timer.h>
@@ -59,14 +58,12 @@ UART_Handle uart;
 void rx_callback(uint_least8_t index)
 {
     READING = 1;
-
 }
 
-
-void timerCallback(Timer_Handle myHandle, int_fast16_t status) {
+void timerCallback(Timer_Handle myHandle, int_fast16_t status)
+{
     STATE = 0;
 }
-
 
 /*
  *  ======== mainThread ========
@@ -76,7 +73,7 @@ void *mainThread(void *arg0)
     /* 1 second delay */
     uint32_t time = 1000;
 
-    const char  echoPrompt[] = "Echoing characters:\r\n";
+    const char echoPrompt[] = "Echoing characters:\r\n";
 
     //UART_Handle uart;
     UART_Params uartParams;
@@ -88,7 +85,7 @@ void *mainThread(void *arg0)
 
     GPIO_setConfig(DIGITAL_TX, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
     GPIO_setConfig(DIGITAL_RX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_BOTH_EDGES);
-    
+
     GPIO_setConfig(HAMBURGER_PIN, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
 
     GPIO_setCallback(DIGITAL_RX, rx_callback);
@@ -97,40 +94,43 @@ void *mainThread(void *arg0)
     GPIO_enableInt(DIGITAL_RX);
 
     /* Create a UART with data processing off. */
-   UART_Params_init(&uartParams);
-   uartParams.writeDataMode = UART_DATA_BINARY;
-   uartParams.readDataMode = UART_DATA_BINARY;
-   uartParams.readReturnMode = UART_RETURN_FULL;
-   uartParams.baudRate = 115200;
+    UART_Params_init(&uartParams);
+    uartParams.writeDataMode = UART_DATA_BINARY;
+    uartParams.readDataMode = UART_DATA_BINARY;
+    uartParams.readReturnMode = UART_RETURN_FULL;
+    uartParams.baudRate = 115200;
 
-   uart = UART_open(CONFIG_UART_0, &uartParams);
-   if (uart == NULL) {
-           /* UART_open() failed */
-           while (1);
-   }
-   UART_write(uart, echoPrompt, sizeof(echoPrompt));
+    uart = UART_open(CONFIG_UART_0, &uartParams);
+    if (uart == NULL)
+    {
+        /* UART_open() failed */
+        while (1)
+            ;
+    }
+    UART_write(uart, echoPrompt, sizeof(echoPrompt));
 
-   Timer_Handle timer0;
-   Timer_Params params;
+    Timer_Handle timer0;
+    Timer_Params params;
 
-   Timer_Params_init(&params);
-   params.period = 300000;
-   params.periodUnits = Timer_PERIOD_US; // microseconds
-   params.timerMode = Timer_ONESHOT_CALLBACK;
-   params.timerCallback = timerCallback;
-   timer0 = Timer_open(CONFIG_TIMER_0, &params);
+    Timer_Params_init(&params);
+    params.period = 300000;
+    params.periodUnits = Timer_PERIOD_US; // microseconds
+    params.timerMode = Timer_ONESHOT_CALLBACK;
+    params.timerCallback = timerCallback;
+    timer0 = Timer_open(CONFIG_TIMER_0, &params);
 
-   query query;
-   unsigned int query_response = 0;
+    query query;
+    unsigned int query_response = 0;
     GPIO_write(HAMBURGER_PIN, 0);
-    while (1) {
-            // GPIO_toggle(HAMBURGER_PIN);
-            int papapa = fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
-            char papa[10];
-          //  sprintf(papa, "DT: %d\r\n", papapa);
-            UART_write(uart, papa, sizeof(papa));
-            fm0_encoder(query_response, 1, TARI, DIGITAL_TX, 0);
-        
+    while (1)
+    {
+        // GPIO_toggle(HAMBURGER_PIN);
+        //int papapa = fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
+        //char papa[10];
+        //  sprintf(papa, "DT: %d\r\n", papapa);
+        //UART_write(uart, papa, sizeof(papa));
+        fm0_encoder(query_response, 1, TARI, DIGITAL_TX, 0);
+
         // switch (STATE)
         // {
         // case 0:   // Envia Query

@@ -37,7 +37,7 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
 
     int edge = 0;  // 0: high to low
                    // 1: low  to high
-    int dt;
+    //unsigned int dt;
     int veioDoUm = 0;
 
     edge = _GPIO_read(pin_rx, port_rx);
@@ -48,10 +48,10 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
 
     int state = start;
     c[0] = 's';
-    UART_write(uart, c, 1);
+    ////UART_write(uart, c, 1);
 
-    int tinit;
-    int tatual;
+    //unsigned int tinit;
+    //unsigned int tatual;
 
     while (1)
     {
@@ -59,13 +59,14 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
         {
         case start:
 
-           // GPIO_write(HAMBURGER_PIN, READING);
+            //GPIO_write(HAMBURGER_PIN, READING);
             if (READING)
             {
+                dt=0;
                 //GPIO_write(HAMBURGER_PIN, READING);
                 READING = 0;
                 edge = change_edge(edge, pin_rx);
-                dt = 0;
+//                tinit = Timer_getCount(timer0);
          //       tinit = read_time();
                 state = read;
             }
@@ -73,10 +74,13 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
         case read:
             // bit ?
             c[0] = 'r';
-            UART_write(uart, c, 1);
+            ////UART_write(uart, c, 1);
+            //tatual = Timer_getCount(timer0);
+            //dt = tatual - tinit;
             if (READING)
             {
                 READING = 0;
+                dt=dt*10;
                 edge = change_edge(edge, pin_rx);
                 if (dt > 0.65 * tari  && dt < 1.35 * tari)
                 {
@@ -90,10 +94,10 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
                 else
                 {
                     state = erro;
-                    break;
                 }
-                //dt = tatual - tinit;
-                dt=0;
+                dt = 0;
+                //tinit = tatual;
+                break;
                 //GPIO_write(HAMBURGER_PIN, READING);
             }
 
@@ -106,17 +110,18 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
                 else
                     state = erro;
             }
-            GPIO_write(HAMBURGER_PIN, 1);
+            //GPIO_write(HAMBURGER_PIN, 1);
 
-            usleep(500);
-            GPIO_write(HAMBURGER_PIN, 0);
+            //usleep(500);
+            //GPIO_write(HAMBURGER_PIN, 0);
 
-            dt = dt + 1;
             break;
         case read_zero:
             c[0] = 'z';
-            UART_write(uart, c, 1);
-
+            //UART_write(uart, c, 1);
+            //tatual = Timer_getCount(timer0);
+            //dt = tatual - tinit;
+            dt=dt*10;
             if (READING)
             {
                 READING = 0;
@@ -130,14 +135,13 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
                 {
                     state = erro;
                 }
-                dt = 0;
+                dt=0;
+
             }
-            usleep(10);
-            dt = dt + 10;
             break;
         case um:
             c[0] = '1';
-           UART_write(uart, c, 1);
+           //UART_write(uart, c, 1);
             *payload = (*payload << 1) | 0x01;
             c_bit++;
             state = read;
@@ -145,7 +149,7 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
             break;
         case zero:
             c[0] = '0';
-            UART_write(uart, c, 1);
+            //UART_write(uart, c, 1);
             *payload = (*payload << 1);
             c_bit++;
             state = read;
@@ -153,12 +157,12 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
             break;
         case fim:
             c[0] = 'f';
-           UART_write(uart, c, 1);
+           //UART_write(uart, c, 1);
             *payload = (*payload >> 1);
             return (c_bit - 1);
         case erro:
             c[0] = 'e';
-            UART_write(uart, c, 1);
+            //UART_write(uart, c, 1);
             *payload = 0;
             return (dt);//(0);
         default:
