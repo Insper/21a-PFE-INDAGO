@@ -7,7 +7,10 @@
 #include "ti_drivers_config.h"
 #endif
 
-enum { start, read, um, read_zero, zero, erro, fim } satte;
+enum
+{
+    start, read, um, read_zero, zero, erro, fim
+} state;
 
 // __pin_handler()
 // {
@@ -30,7 +33,8 @@ static int change_edge(int edge, unsigned short pin_rx)
 
 // void fm0_decoder(int tari, int *package, unsigned short pin_rx,
 //                  unsigned char port_rx)
-int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned char port_rx)
+int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx,
+                unsigned char port_rx)
 {
 #ifdef dec
     int c_bit = 0;
@@ -52,6 +56,8 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
 
     //unsigned int tinit;
     //unsigned int tatual;
+    //unsigned int resultante_tempo = 0;
+    resultante_tempo = 0;
 
     while (1)
     {
@@ -62,31 +68,36 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
             //GPIO_write(HAMBURGER_PIN, READING);
             if (READING)
             {
-                dt=0;
+                dt = reading_timer;
                 //GPIO_write(HAMBURGER_PIN, READING);
                 READING = 0;
                 edge = change_edge(edge, pin_rx);
 //                tinit = Timer_getCount(timer0);
-         //       tinit = read_time();
+                //       tinit = read_time();
                 state = read;
             }
             break;
         case read:
             // bit ?
-            c[0] = 'r';
+            //c[0] = 'r';
             ////UART_write(uart, c, 1);
             //tatual = Timer_getCount(timer0);
             //dt = tatual - tinit;
             if (READING)
             {
                 READING = 0;
-                dt=dt*10;
+                // sprintf(c, "DT: %d\r\n", dt);
+                // UART_write(uart, c, sizeof(c));
+                // dt=dt*10;
+                resultante_tempo = reading_timer - dt;
                 edge = change_edge(edge, pin_rx);
-                if (dt > 0.65 * tari  && dt < 1.35 * tari)
+                if ((resultante_tempo > (0.65 * tari))
+                        && (resultante_tempo < (1.35 * tari)))
                 {
                     state = um;
                 }
-                else if (dt > 0.35 * tari && dt < 0.65 * tari)
+                else if (resultante_tempo > 0.35 * tari
+                        && resultante_tempo < 0.65 * tari)
                 {
                     state = read_zero;
                     // edge = change_edge(edge, pin_rx);
@@ -94,8 +105,10 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
                 else
                 {
                     state = erro;
+                    //GPIO_toggle(HAMBURGER_PIN);
                 }
-                dt = 0;
+                // reading_timer = 0;
+                dt = reading_timer;
                 //tinit = tatual;
                 break;
                 //GPIO_write(HAMBURGER_PIN, READING);
@@ -103,12 +116,17 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
 
             // fim da transmissao
 
-            if (dt > 5 * tari)
+            if (Timer_getCount(timer0) - dt > 5 * tari)
             {
                 if (veioDoUm == 1)
+                {
                     state = fim;
+                }
                 else
+                {
                     state = erro;
+                    GPIO_toggle(HAMBURGER_PIN);
+                }
             }
             //GPIO_write(HAMBURGER_PIN, 1);
 
@@ -117,16 +135,18 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
 
             break;
         case read_zero:
-            c[0] = 'z';
+            // c[0] = 'z';
             //UART_write(uart, c, 1);
             //tatual = Timer_getCount(timer0);
             //dt = tatual - tinit;
-            dt=dt*10;
+            // dt=dt*10;
             if (READING)
             {
                 READING = 0;
                 edge = change_edge(edge, pin_rx);
-                if (dt > 0.35 * tari && dt < 0.65 * tari)
+                resultante_tempo = reading_timer - dt;
+                if (resultante_tempo > 0.35 * tari
+                        && resultante_tempo < 0.65 * tari)
                 {
                     state = zero;
                     // edge = change_edge(edge, pin_rx);
@@ -135,13 +155,14 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
                 {
                     state = erro;
                 }
-                dt=0;
+                // reading_timer = 0;
+                dt = reading_timer;
 
             }
             break;
         case um:
             c[0] = '1';
-           //UART_write(uart, c, 1);
+            //UART_write(uart, c, 1);
             *payload = (*payload << 1) | 0x01;
             c_bit++;
             state = read;
@@ -157,14 +178,14 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned short pin_rx, unsigned
             break;
         case fim:
             c[0] = 'f';
-           //UART_write(uart, c, 1);
+            //UART_write(uart, c, 1);
             *payload = (*payload >> 1);
             return (c_bit - 1);
         case erro:
             c[0] = 'e';
             //UART_write(uart, c, 1);
             *payload = 0;
-            return (dt);//(0);
+            return (dt);            //(0);
         default:
             state = erro;
             break;

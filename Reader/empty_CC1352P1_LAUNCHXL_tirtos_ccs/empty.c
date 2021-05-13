@@ -53,34 +53,46 @@
 
 volatile char STATE = 0;
 volatile char READING = 0;
+volatile unsigned int dt = 0;
+volatile unsigned int reading_timer = 0;
+volatile unsigned int resultante_tempo = 0;
 UART_Handle uart;
+Timer_Handle timer0;
 
 void rx_callback(uint_least8_t index)
 {
     READING = 1;
+    // GPIO_toggle(HAMBURGER_PIN);
+    reading_timer = Timer_getCount(timer0);
+    // dt=0;
 }
 
-void timerCallback(Timer_Handle myHandle, int_fast16_t status)
-{
-    STATE = 0;
-}
+// void timre_callback(uint_least8_t index)
+// {
+//     dt = dt + 1;
+//     if (dt > 4294967000)
+//     {
+//         dt = 0;
+//         //GPIO_toggle(HAMBURGER_PIN);
+//     }
+// }
 
 /*
  *  ======== mainThread ========
  */
-void *mainThread(void *arg0)
+void* mainThread(void *arg0)
 {
     /* 1 second delay */
     uint32_t time = 1000;
 
     const char echoPrompt[] = "Echoing characters:\r\n";
 
-    //UART_Handle uart;
+    // UART_Handle uart;
     UART_Params uartParams;
 
     /* Call driver init functions */
     GPIO_init();
-    UART_init();
+    // UART_init();
     Timer_init();
 
     GPIO_setConfig(DIGITAL_TX, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
@@ -94,42 +106,54 @@ void *mainThread(void *arg0)
     GPIO_enableInt(DIGITAL_RX);
 
     /* Create a UART with data processing off. */
-    UART_Params_init(&uartParams);
-    uartParams.writeDataMode = UART_DATA_BINARY;
-    uartParams.readDataMode = UART_DATA_BINARY;
-    uartParams.readReturnMode = UART_RETURN_FULL;
-    uartParams.baudRate = 115200;
-
-    uart = UART_open(CONFIG_UART_0, &uartParams);
-    if (uart == NULL)
-    {
-        /* UART_open() failed */
-        while (1)
-            ;
-    }
-    UART_write(uart, echoPrompt, sizeof(echoPrompt));
-
-    Timer_Handle timer0;
+    // UART_Params_init(&uartParams);
+    // uartParams.writeDataMode = UART_DATA_BINARY;
+    // uartParams.readDataMode = UART_DATA_BINARY;
+    // uartParams.readReturnMode = UART_RETURN_FULL;
+    // uartParams.baudRate = 115200;
+    // uart = UART_open(CONFIG_UART_0, &uartParams);
+    // if (uart == NULL)
+    // {
+    //     /* UART_open() failed */
+    //     while (1)
+    //         ;
+    // }
     Timer_Params params;
 
+    // Timer_Params_init(&params);
+    // params.period = 10;
+    // params.periodUnits = Timer_PERIOD_US; // microseconds
+    // params.timerMode = Timer_CONTINUOUS_CALLBACK;
+    // params.timerCallback = timre_callback;
+    // timer0 = Timer_open(CONFIG_TIMER_0, &params);
     Timer_Params_init(&params);
-    params.period = 300000;
+    params.period = 1;
     params.periodUnits = Timer_PERIOD_US; // microseconds
-    params.timerMode = Timer_ONESHOT_CALLBACK;
-    params.timerCallback = timerCallback;
+    params.timerMode = Timer_FREE_RUNNING;
     timer0 = Timer_open(CONFIG_TIMER_0, &params);
 
     query query;
     unsigned int query_response = 0;
     GPIO_write(HAMBURGER_PIN, 0);
+
+    if (Timer_start(timer0) == Timer_STATUS_ERROR)
+    {
+        while (1)
+        {
+            //GPIO_toggle(HAMBURGER_PIN);
+        }
+    }
+
+    char papa[32];
+    // UART_write(uart, "Vai comecar: ", sizeof("Vai comecar: "));
     while (1)
     {
-        // GPIO_toggle(HAMBURGER_PIN);
-        //int papapa = fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
-        //char papa[10];
-        //  sprintf(papa, "DT: %d\r\n", papapa);
-        //UART_write(uart, papa, sizeof(papa));
-        fm0_encoder(query_response, 1, TARI, DIGITAL_TX, 0);
+        //GPIO_toggle(HAMBURGER_PIN);
+        int papapa = fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
+
+        //sprintf(papa, "DT: %d\r\n", dt);
+        //UART_write(uart, "oi", sizeof("oi"));
+        fm0_encoder(query_response, 4, TARI, DIGITAL_TX, 0);
 
         // switch (STATE)
         // {
