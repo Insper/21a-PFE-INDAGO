@@ -37,7 +37,7 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             if (READING)
             {
                 READING = 0;
-                edge = _change_edge(edge, pin_rx);
+                edge = _change_edge(edge, pin_rx, port_rx);
                 dt = 0;
                 state = read;
             }
@@ -46,7 +46,7 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             if (READING)
             {
                 READING = 0;
-                edge = _change_edge(edge, pin_rx);
+                edge = _change_edge(edge, pin_rx, port_rx);
                 if ((reading_timer * 100 > (0.65 * tari)) && (reading_timer * 100 < (1.35 * tari)))
                 {
                     state = um;
@@ -80,7 +80,7 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             if (READING)
             {
                 READING = 0;
-                edge = _change_edge(edge, pin_rx);
+                edge = _change_edge(edge, pin_rx, port_rx);
                 resultante_tempo = reading_timer - dt;
                 if (reading_timer * 100 > 0.35 * tari && reading_timer * 100 < 0.65 * tari)
                 {

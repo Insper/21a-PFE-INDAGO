@@ -49,6 +49,14 @@
 #include "main_includes.h"
 #include <msp430.h>
 
+
+volatile char STATE = 0;
+volatile char READING = 0;
+volatile unsigned int dt = 0;
+volatile unsigned int reading_timer = 0;
+volatile unsigned int resultante_tempo = 0;
+
+
 uint8_t RXData = 0;                               // UART Receive byte
 int mode = 0;                                     // mode selection variable
 int pingHost = 0;                                 // ping request from PC GUI
@@ -59,7 +67,6 @@ Calendar calendar;                                // Calendar used for RTC
 __no_init uint16_t dataArray[12289];
 #endif
 
-int hora_da_leitura = 0;
 
 //-----------------------------------------------------------------------------
 int _system_pre_init(void)
@@ -116,61 +123,31 @@ void send_bits_uart(int package, int size)
 int main(void)
 {
 
-    // Check if a wakeup from LPMx.5
-    if (SYSRSTIV == SYSRSTIV_LPM5WU)
-    {
-        // Button S2 pressed
-        if (P1IFG & BIT1)
-        {
-            // Clear P1.1 interrupt flag
-            GPIO_clearInterrupt(GPIO_PORT_P1, GPIO_PIN0);
-
-            // Exit FRAM Log Mode
-            mode = '0';
-
-            // Light up LED1 to indicate Exit from FRAM mode
-            Init_GPIO();
-            GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN2);
-            __delay_cycles(600000);
-        }
-        else
-        {
-            // Continue FRAM data logging
-            mode = FRAM_LOG_MODE;
-            Init_GPIO();
-        }
-    }
-    else
-    {
-        Init_GPIO();
-        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-
-        // Toggle LED1 and LED2 to indicate OutOfBox Demo start
-        int i;
-        for (i = 0; i < 10; i++)
-        {
-            GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            GPIO_toggleOutputOnPin(GPIO_PORT_P4, GPIO_PIN2);
-            __delay_cycles(200000);
-        }
-    }
-
     // Board initializations
     Init_GPIO();
     Init_Clock();
     Init_UART();
 
     unsigned int query_response = 0;
-    unsigned short random_number = rn16_generate();
+
+    unsigned int n;
+    //unsigned short random_number = rn16_generate();
+    __delay_cycles(10000000);
+    fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
     while (1)
     {
+        unsigned int erro = fm0_decoder(TARI, &query_response, &n , GPIO_PIN2, GPIO_PORT_P4);
+        __delay_cycles(10000000);
+        if(erro)
+            __delay_cycles(100);
+        fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
+
         //char str[] = "teste ";
         //send_uart(&str);
         //GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        __delay_cycles(100000000);
-        fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
-        __delay_cycles(20000000000000);
-        // if (hora_da_leitura)
+        //__delay_cycles(10000000);
+        //fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
+        //__delay_cycles(100000000);// if (hora_da_leitura)
         // {
         //     GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
         //     fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
@@ -197,7 +174,6 @@ void Init_GPIO()
 
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
     GPIO_setAsInputPin(GPIO_PORT_P4, GPIO_PIN2);
-    GPIO_setAsInputPin(GPIO_PORT_P2, GPIO_PIN5);
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN6);
 
     // Configure P2.0 - UCA0TXD and P2.1 - UCA0RXD
@@ -222,21 +198,13 @@ void Init_GPIO()
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
 
-    GPIO_selectInterruptEdge(GPIO_PORT_P2, GPIO_PIN5,
-                             GPIO_HIGH_TO_LOW_TRANSITION);
-    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P2, GPIO_PIN5);
-    GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-    GPIO_enableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-
     // initialize Timer0_A
-    TA0CCR0 = 62500;  // set up terminal count
-    TA0CTL = TASSEL_2 + ID_3 + MC_1; // configure and start timer
+    TA0CCR0 = 0;
+    TA0CCTL0 |= CCIE;
+    TA0CTL = TASSEL_2 + ID_0 + MC_1;
 
-    // enable interrupts
-    // TA0CCTL0_bit.CCIE = 1;// enable timer interrupts
-
-    // Enable global interrupt
     __enable_interrupt();
+    TA0CCR0 = 795; // Magia , FAVOR NÃO ALTERAR
 }
 
 /*
@@ -346,30 +314,17 @@ __interrupt void USCI_A0_ISR(void)
 #pragma vector = PORT4_VECTOR
 __interrupt void PIN_RX_ISR(void)
 {
-    GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-    GPIO_disableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-    hora_da_leitura = 1;
+    //GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    READING = 1;
+    reading_timer = dt;
+    dt=0;
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-    GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-
-}
-
-/*
- * PIN interrupt to read content
- */
-#pragma vector = PORT2_VECTOR
-__interrupt void PIN_RX2_ISR(void)
-{
-    GPIO_disableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-    GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-    hora_da_leitura = 1;
-    GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-    GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    //GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
 
 }
 
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void myTimerISR(void)
 {
-    GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    dt = dt + 1;
 }
