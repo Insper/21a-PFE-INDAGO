@@ -168,7 +168,7 @@ int main(void)
         //send_uart(&str);
         //GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
         __delay_cycles(100000000);
-        fm0_encoder(0b1011, 4, TARI, GPIO_PIN6, GPIO_PORT_P2);
+        fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
         __delay_cycles(20000000000000);
         // if (hora_da_leitura)
         // {

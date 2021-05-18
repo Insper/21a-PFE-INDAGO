@@ -53,4 +53,5 @@ void fm0_encoder(int package, int size, int tari, unsigned short pin_tx,
         }
     }
     fm0_encode1(tari, pin_tx, port_tx);
+    _GPIO_toggle(pin_tx, port_tx);
 }

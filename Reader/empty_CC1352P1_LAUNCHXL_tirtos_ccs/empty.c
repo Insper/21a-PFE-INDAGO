@@ -61,21 +61,15 @@ Timer_Handle timer0;
 
 void rx_callback(uint_least8_t index)
 {
+    reading_timer = dt;
     READING = 1;
-    // GPIO_toggle(HAMBURGER_PIN);
-    reading_timer = Timer_getCount(timer0);
-    // dt=0;
+    dt = 0;
 }
 
-// void timre_callback(uint_least8_t index)
-// {
-//     dt = dt + 1;
-//     if (dt > 4294967000)
-//     {
-//         dt = 0;
-//         //GPIO_toggle(HAMBURGER_PIN);
-//     }
-// }
+void timre_callback(uint_least8_t index)
+{
+     dt = dt + 1;
+}
 
 /*
  *  ======== mainThread ========
@@ -127,9 +121,10 @@ void* mainThread(void *arg0)
     // params.timerCallback = timre_callback;
     // timer0 = Timer_open(CONFIG_TIMER_0, &params);
     Timer_Params_init(&params);
-    params.period = 1;
+    params.period = 100;
     params.periodUnits = Timer_PERIOD_US; // microseconds
-    params.timerMode = Timer_FREE_RUNNING;
+    params.timerMode = Timer_CONTINUOUS_CALLBACK;
+    params.timerCallback = timre_callback;
     timer0 = Timer_open(CONFIG_TIMER_0, &params);
 
     query query;
@@ -148,12 +143,35 @@ void* mainThread(void *arg0)
     // UART_write(uart, "Vai comecar: ", sizeof("Vai comecar: "));
     while (1)
     {
+        // if(READING){
+        //     reading_timer = Timer_getCount(timer0);
+        //     READING=0;
+        //     dt = reading_timer;
+        //     GPIO_toggle(HAMBURGER_PIN);
+        //     while(1){
+        //         if(READING){
+        //             reading_timer = Timer_getCount(timer0);
+        //             GPIO_toggle(HAMBURGER_PIN);
+        //             READING=0;
+        //             resultante_tempo = reading_timer - dt;
+        //             break;
+        //         }
+        //     }
+
+       // }
         //GPIO_toggle(HAMBURGER_PIN);
-        int papapa = fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
+        unsigned int n;
+        int erro = fm0_decoder(TARI, &query_response, &n , DIGITAL_RX, 0);
+
+        if(erro)
+            usleep(10);
+        else
+            fm0_encoder(query_response, n, TARI, DIGITAL_TX, 0);
+
 
         //sprintf(papa, "DT: %d\r\n", dt);
         //UART_write(uart, "oi", sizeof("oi"));
-        fm0_encoder(query_response, 4, TARI, DIGITAL_TX, 0);
+        //fm0_encoder(query_response, 4, TARI, DIGITAL_TX, 0);
 
         // switch (STATE)
         // {
