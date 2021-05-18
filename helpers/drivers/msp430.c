@@ -31,3 +31,14 @@ unsigned int _GPIO_read(unsigned short pin, unsigned char port)
 {
     return GPIO_getInputPinValue(port, pin);
 }
+
+unsigned int _change_edge(int edge, unsigned short pin_rx)
+{
+    GPIO_write(HAMBURGER_PIN, edge);
+    if (edge)
+        //GPIO_setConfig(pin_rx, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
+    else
+        //GPIO_setConfig(pin_rx, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_RISING);
+
+    return !edge;
+}

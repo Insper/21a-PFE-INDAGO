@@ -1,57 +1,29 @@
 #include "fm0_decoder.h"
 
-#define dec
-
-#ifdef dec
-#include <ti/drivers/GPIO.h>
-#include "ti_drivers_config.h"
-#endif
-
 enum
 {
-    start, read, um, read_zero, zero, erro, fim
+    start,
+    read,
+    um,
+    read_zero,
+    zero,
+    erro,
+    fim
 } state;
 
-// __pin_handler()
-// {
-//     flag = 1;
-// }
-
-static int change_edge(int edge, unsigned short pin_rx)
-{
-#ifdef dec
-    return 0;
-#endif
-
-#ifdef dec1
-    GPIO_write(HAMBURGER_PIN, edge);
-    if (edge)
-        GPIO_setConfig(pin_rx, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
-    else
-        GPIO_setConfig(pin_rx, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_RISING);
-
-    return !edge;
-#else
-    return 0;
-#endif
-}
-
-// void fm0_decoder(int tari, int *package, unsigned short pin_rx,
-//                  unsigned char port_rx)
 int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short pin_rx,
                 unsigned char port_rx)
 {
-#ifdef dec
+
     int c_bit = 0;
 
-    int edge = 0;  // 0: high to low
-                   // 1: low  to high
-    //unsigned int dt;
+    int edge = 0; // 0: high to low
+                  // 1: low  to high
+
     int veioDoUm = 0;
 
     edge = _GPIO_read(pin_rx, port_rx);
     //change_edge(edge, pin_rx);
-
 
     int state = start;
 
@@ -65,8 +37,8 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             if (READING)
             {
                 READING = 0;
-                edge = change_edge(edge, pin_rx);
-                dt=0;
+                edge = _change_edge(edge, pin_rx);
+                dt = 0;
                 state = read;
             }
             break;
@@ -74,14 +46,12 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             if (READING)
             {
                 READING = 0;
-                edge = change_edge(edge, pin_rx);
-                if ((reading_timer * 100 > (0.65 * tari))
-                        && (reading_timer * 100 < (1.35 * tari)))
+                edge = _change_edge(edge, pin_rx);
+                if ((reading_timer * 100 > (0.65 * tari)) && (reading_timer * 100 < (1.35 * tari)))
                 {
                     state = um;
                 }
-                else if (reading_timer * 100 > 0.35 * tari
-                        && reading_timer * 100 < 0.65 * tari)
+                else if (reading_timer * 100 > 0.35 * tari && reading_timer * 100 < 0.65 * tari)
                 {
                     state = read_zero;
                 }
@@ -110,10 +80,9 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             if (READING)
             {
                 READING = 0;
-                edge = change_edge(edge, pin_rx);
+                edge = _change_edge(edge, pin_rx);
                 resultante_tempo = reading_timer - dt;
-                if (reading_timer * 100 > 0.35 * tari
-                        && reading_timer * 100 < 0.65 * tari)
+                if (reading_timer * 100 > 0.35 * tari && reading_timer * 100 < 0.65 * tari)
                 {
                     state = zero;
                 }
@@ -141,23 +110,20 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             return (0);
         case erro:
             *payload = 0;
-            return (dt);            //(0);
+            return (1);
         default:
             state = erro;
-            return(1);
+            return (1);
             break;
         }
     }
-#else
-    return(0);
-#endif
 }
 
 // /************************************************************************/
 // /* functions                                                            */
 // /************************************************************************/
 // /*!
-//  *  @brief Receive FM0 data from PIN_RX and translate and store data to package 
+//  *  @brief Receive FM0 data from PIN_RX and translate and store data to package
 //  *
 //  *  @param      pin_rx  pin RX
 //  *  @param      tari    tari time

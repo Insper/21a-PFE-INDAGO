@@ -16,3 +16,9 @@ unsigned int _GPIO_read(unsigned short pin, unsigned char port)
 {
     return GPIO_read(pin);
 }
+
+
+unsigned int _change_edge(int edge, unsigned short pin_rx)
+{
+    return 0;
+}
