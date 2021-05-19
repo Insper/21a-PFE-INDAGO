@@ -51,17 +51,24 @@
 /* IGNORAR ISSO */
 #include "main_includes.h"
 
-char STATE = 0;
-char READING = 0;
+volatile char STATE = 0;
+volatile char READING = 0;
+volatile unsigned int dt = 0;
+volatile unsigned int reading_timer = 0;
+volatile unsigned int resultante_tempo = 0;
+UART_Handle uart;
+Timer_Handle timer0;
 
 void rx_callback(uint_least8_t index)
 {
+    reading_timer = dt;
     READING = 1;
+    dt = 0;
 }
 
-void timerCallback(Timer_Handle myHandle, int_fast16_t status)
+void timre_callback(uint_least8_t index)
 {
-    STATE = 0;
+     dt = dt + 1;
 }
 
 /*
@@ -74,101 +81,125 @@ void* mainThread(void *arg0)
 
     const char echoPrompt[] = "Echoing characters:\r\n";
 
-    UART_Handle uart;
+    // UART_Handle uart;
     UART_Params uartParams;
 
     /* Call driver init functions */
     GPIO_init();
-    UART_init();
+    // UART_init();
     Timer_init();
 
     GPIO_setConfig(DIGITAL_TX, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
-    GPIO_setConfig(DIGITAL_RX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_FALLING);
+    GPIO_setConfig(DIGITAL_RX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_BOTH_EDGES);
+
+    GPIO_setConfig(HAMBURGER_PIN, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
 
     GPIO_setCallback(DIGITAL_RX, rx_callback);
 
     /* Enable interrupts */
-    GPIO_enableInt (DIGITAL_RX);
+    GPIO_enableInt(DIGITAL_RX);
 
     /* Create a UART with data processing off. */
-    UART_Params_init(&uartParams);
-    uartParams.writeDataMode = UART_DATA_BINARY;
-    uartParams.readDataMode = UART_DATA_BINARY;
-    uartParams.readReturnMode = UART_RETURN_FULL;
-    uartParams.baudRate = 115200;
-
-    uart = UART_open(CONFIG_UART_0, &uartParams);
-    if (uart == NULL)
-    {
-        /* UART_open() failed */
-        while (1)
-            ;
-    }
-    UART_write(uart, echoPrompt, sizeof(echoPrompt));
-
-    Timer_Handle timer0;
+    // UART_Params_init(&uartParams);
+    // uartParams.writeDataMode = UART_DATA_BINARY;
+    // uartParams.readDataMode = UART_DATA_BINARY;
+    // uartParams.readReturnMode = UART_RETURN_FULL;
+    // uartParams.baudRate = 115200;
+    // uart = UART_open(CONFIG_UART_0, &uartParams);
+    // if (uart == NULL)
+    // {
+    //     /* UART_open() failed */
+    //     while (1)
+    //         ;
+    // }
     Timer_Params params;
 
+    // Timer_Params_init(&params);
+    // params.period = 10;
+    // params.periodUnits = Timer_PERIOD_US; // microseconds
+    // params.timerMode = Timer_CONTINUOUS_CALLBACK;
+    // params.timerCallback = timre_callback;
+    // timer0 = Timer_open(CONFIG_TIMER_0, &params);
     Timer_Params_init(&params);
-    params.period = 300000;
+    params.period = 100;
     params.periodUnits = Timer_PERIOD_US; // microseconds
-    params.timerMode = Timer_ONESHOT_CALLBACK;
-    params.timerCallback = timerCallback;
+    params.timerMode = Timer_CONTINUOUS_CALLBACK;
+    params.timerCallback = timre_callback;
     timer0 = Timer_open(CONFIG_TIMER_0, &params);
-    sleep(1);
+
     query query;
     unsigned int query_response = 0;
+    unsigned int n=0;
+    GPIO_write(HAMBURGER_PIN, 0);
 
-    sleep(2);
+    if (Timer_start(timer0) == Timer_STATUS_ERROR)
+    {
+        while (1)
+        {
+            //GPIO_toggle(HAMBURGER_PIN);
+        }
+    }
 
+    char papa[32];
+    // UART_write(uart, "Vai comecar: ", sizeof("Vai comecar: "));
     while (1)
     {
-        UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
-        switch (STATE)
-        {
-        case 0:   // Envia Query
+        // if(READING){
+        //     reading_timer = Timer_getCount(timer0);
+        //     READING=0;
+        //     dt = reading_timer;
+        //     GPIO_toggle(HAMBURGER_PIN);
+        //     while(1){
+        //         if(READING){
+        //             reading_timer = Timer_getCount(timer0);
+        //             GPIO_toggle(HAMBURGER_PIN);
+        //             READING=0;
+        //             resultante_tempo = reading_timer - dt;
+        //             break;
+        //         }
+        //     }
 
-            query_init(&query, 0, 0, 0, 1, 0, 0, 0);
-            query_build(&query);
+        // }
+        //GPIO_toggle(HAMBURGER_PIN);
+        //unsigned int n;
+        //int erro = fm0_decoder(TARI, &query_response, &n , DIGITAL_RX, 0);
 
-            //fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
-            fm0_encoder(0b1001, 4, TARI, DIGITAL_TX, 0);
-            Timer_start(timer0);
+        fm0_encoder(0b1111001010, 10, TARI, DIGITAL_TX, 0);
+        sleep(2);
 
-            STATE = 1;
-            break;
+        //fm0_encoder(0b111100001010, 12, TARI, DIGITAL_TX, 0);
+        //_usleep(3000000);
 
-        case 1: // Aguarda resposta
-            if (READING)
-            {
-                GPIO_disableInt(DIGITAL_RX);
-                Timer_stop(timer0);
-                fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
-                UART_write(uart, "READ\r\n", sizeof("READ\r\n"));
-                READING = 0;
-                GPIO_enableInt(DIGITAL_RX);
-                STATE = 2;
-            }
-            else
-            {
-                UART_write(uart, "NOPS\r\n", sizeof("NOPS\r\n"));
-            }
-            break;
-        case 2:
-            UART_write(uart, "Sleep\r\n", sizeof("Sleep\r\n"));
 
-            sleep(2);
-            if (Timer_start(timer0) == Timer_STATUS_ERROR)
-            {
-                /* Failed to start timer */
-                while (1)
-                {
-                    UART_write(uart, "DEU RUIM 2\r\n",
-                               sizeof("DEU RUIM 2\r\n"));
-                }
-            }
-            break;
+        //sprintf(papa, "DT: %d\r\n", dt);
+        //UART_write(uart, "oi", sizeof("oi"));
+        //fm0_encoder(query_response, 4, TARI, DIGITAL_TX, 0);
 
-        }
+        // switch (STATE)
+        // {
+        // case 0:   // Envia Query
+        //     UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
+        //     query_init(&query, 0, 0, 0, 1, 0, 0, 0);
+        //     query_build(&query);
+        //     fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
+        //     if (Timer_start(timer0) == Timer_STATUS_ERROR) {
+        //             /* Failed to start timer */
+        //             while (1) {}
+        //         }
+
+        //     STATE = 1;
+        //     break;
+
+        // case 1: // Aguarda resposta
+        //     if(READING){
+        //         GPIO_disableInt(DIGITAL_RX);
+        //         fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
+        //         // fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
+        //         READING = 0;
+        //         GPIO_enableInt(DIGITAL_RX);
+        //     }
+        //     break;
+
+        // }
     }
 }

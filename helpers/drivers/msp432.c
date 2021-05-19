@@ -7,10 +7,18 @@ void _GPIO_toggle(unsigned short pin, unsigned char port)
 
 void _usleep(unsigned int time)
 {
-    usleep(time - 50);
+    dt = 0;
+    while(dt*100<time){}
+
 }
 
 unsigned int _GPIO_read(unsigned short pin, unsigned char port)
 {
     return GPIO_read(pin);
+}
+
+
+unsigned int _change_edge(int edge, unsigned short pin_rx, unsigned char port)
+{
+    return 0;
 }
