@@ -23,7 +23,7 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
     int veioDoUm = 0;
 
     edge = _GPIO_read(pin_rx, port_rx);
-    //change_edge(edge, pin_rx);
+    edge = _change_edge(!edge, pin_rx, port_rx);
 
     int state = start;
 
