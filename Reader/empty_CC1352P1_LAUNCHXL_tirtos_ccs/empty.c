@@ -51,13 +51,25 @@
 /* IGNORAR ISSO */
 #include "main_includes.h"
 
-volatile char STATE = 0;
 volatile char READING = 0;
 volatile unsigned int dt = 0;
 volatile unsigned int reading_timer = 0;
 volatile unsigned int resultante_tempo = 0;
-UART_Handle uart;
+// UART_Handle uart;
 Timer_Handle timer0;
+
+enum
+{
+    start,
+    send_query,
+    receive_rn16,
+    send_ack,
+    receive_pc,
+    send_req_rn,
+    receive_handle,
+    send_command,
+    error,
+} COMMUNICATION_STATE;
 
 void rx_callback(uint_least8_t index)
 {
@@ -68,7 +80,7 @@ void rx_callback(uint_least8_t index)
 
 void timre_callback(uint_least8_t index)
 {
-     dt = dt + 1;
+    dt = dt + 1;
 }
 
 /*
@@ -91,8 +103,6 @@ void* mainThread(void *arg0)
 
     GPIO_setConfig(DIGITAL_TX, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
     GPIO_setConfig(DIGITAL_RX, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_BOTH_EDGES);
-
-    GPIO_setConfig(HAMBURGER_PIN, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
 
     GPIO_setCallback(DIGITAL_RX, rx_callback);
 
@@ -128,78 +138,97 @@ void* mainThread(void *arg0)
     timer0 = Timer_open(CONFIG_TIMER_0, &params);
 
     query query;
-    unsigned int query_response = 0;
-    unsigned int n=0;
-    GPIO_write(HAMBURGER_PIN, 0);
+    ack ack;
+    rn16 rn16;
+    req_rn req_rn;
+    nak nak;
 
-    if (Timer_start(timer0) == Timer_STATUS_ERROR)
-    {
-        while (1)
-        {
-            //GPIO_toggle(HAMBURGER_PIN);
-        }
-    }
+    unsigned int query_response = 0;
+    unsigned int ack_response = 0;
+    unsigned int req_rn_response = 0;
+    
+    unsigned int query_response_size = 0;
+    unsigned int ack_response_size = 0;
+    unsigned int req_rn_response_size = 0;
+
+    int comm_error = 0;
+    
+    if (Timer_start(timer0) == Timer_STATUS_ERROR) { while (1){} }
 
     char papa[32];
     // UART_write(uart, "Vai comecar: ", sizeof("Vai comecar: "));
+    COMMUNICATION_STATE = start;
     while (1)
     {
-        // if(READING){
-        //     reading_timer = Timer_getCount(timer0);
-        //     READING=0;
-        //     dt = reading_timer;
-        //     GPIO_toggle(HAMBURGER_PIN);
-        //     while(1){
-        //         if(READING){
-        //             reading_timer = Timer_getCount(timer0);
-        //             GPIO_toggle(HAMBURGER_PIN);
-        //             READING=0;
-        //             resultante_tempo = reading_timer - dt;
-        //             break;
-        //         }
-        //     }
+        switch (COMMUNICATION_STATE)
+        {
+            case start:
+                COMMUNICATION_STATE = send_query;
+                break;
 
-        // }
-        //GPIO_toggle(HAMBURGER_PIN);
-        //unsigned int n;
-        //int erro = fm0_decoder(TARI, &query_response, &n , DIGITAL_RX, 0);
+            case send_query:
+                query_init(&query, 0, 0, 0, 1, 0, 0, 0);
+                query_build(&query);
+                fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
+                COMMUNICATION_STATE = receive_rn16;
+                break;
 
-        fm0_encoder(0b1111001010, 10, TARI, DIGITAL_TX, 0);
-        sleep(2);
+            case receive_rn16:
+                comm_error = fm0_decoder(TARI, &query_response, &query_response_size, DIGITAL_RX, 0, COMMUNICATION_TIMEOUT);
+                if (comm_error || query_response_size!=16)
+                    COMMUNICATION_STATE = error;
+                else {
+                    rn16.value = query_response;
+                    rn16.size = query_response_size;
+                    COMMUNICATION_STATE = send_ack;
+                }
+                break;
 
-        //fm0_encoder(0b111100001010, 12, TARI, DIGITAL_TX, 0);
-        //_usleep(3000000);
+            case send_ack:
+                ack_init(&ack, rn16.value);
+                ack_build(&ack);
+                fm0_encoder(ack.result_data, ack.size, TARI, DIGITAL_TX, 0);
+                COMMUNICATION_STATE = receive_pc;
+                break;
+            
+            case receive_pc:
+                comm_error = fm0_decoder(TARI, &ack_response, &ack_response_size, DIGITAL_RX, 0, COMMUNICATION_TIMEOUT);
+                if (comm_error)
+                    COMMUNICATION_STATE = error;
+                else
+                    COMMUNICATION_STATE = send_req_rn;
+                break;
 
+            case send_req_rn:
+                req_rn_init(&req_rn, rn16.value, 0x10);
+                req_rn_build(&req_rn);
+                fm0_encoder(req_rn.result_data, req_rn.size, TARI, DIGITAL_TX, 0);
+                COMMUNICATION_STATE = receive_handle;
+                break;
 
-        //sprintf(papa, "DT: %d\r\n", dt);
-        //UART_write(uart, "oi", sizeof("oi"));
-        //fm0_encoder(query_response, 4, TARI, DIGITAL_TX, 0);
+            case receive_handle:
+                comm_error = fm0_decoder(TARI, &req_rn_response, &req_rn_response_size, DIGITAL_RX, 0, COMMUNICATION_TIMEOUT);
+                if (comm_error)
+                    COMMUNICATION_STATE = error;
+                else
+                    COMMUNICATION_STATE = send_command;
+                break;
+            
+            case send_command:
+                // Initiate communication
+                nak_init(&nak);
+                nak_build(&nak);
+                fm0_encoder(nak.result_data, nak.size, TARI, DIGITAL_TX, 0);
+                COMMUNICATION_STATE = start;
+                break;
 
-        // switch (STATE)
-        // {
-        // case 0:   // Envia Query
-        //     UART_write(uart, "Enviando\r\n", sizeof("Enviando\r\n"));
-        //     query_init(&query, 0, 0, 0, 1, 0, 0, 0);
-        //     query_build(&query);
-        //     fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
-        //     if (Timer_start(timer0) == Timer_STATUS_ERROR) {
-        //             /* Failed to start timer */
-        //             while (1) {}
-        //         }
+            case error:
+                COMMUNICATION_STATE = start;
+                break;
 
-        //     STATE = 1;
-        //     break;
-
-        // case 1: // Aguarda resposta
-        //     if(READING){
-        //         GPIO_disableInt(DIGITAL_RX);
-        //         fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
-        //         // fm0_decoder(TARI, &query_response, DIGITAL_RX, 0);
-        //         READING = 0;
-        //         GPIO_enableInt(DIGITAL_RX);
-        //     }
-        //     break;
-
-        // }
+            default:
+                COMMUNICATION_STATE = error;
+                break;
+        }
     }
 }

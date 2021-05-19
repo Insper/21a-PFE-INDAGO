@@ -12,7 +12,7 @@ enum
 } state;
 
 int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short pin_rx,
-                unsigned char port_rx)
+                unsigned char port_rx, unsigned int timeout)
 {
 
     int c_bit = 0;
@@ -40,6 +40,8 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
                 edge = _change_edge(edge, pin_rx, port_rx);
                 dt = 0;
                 state = read;
+            } else if (dt>timeout) {
+                state = erro;
             }
             break;
         case read:
