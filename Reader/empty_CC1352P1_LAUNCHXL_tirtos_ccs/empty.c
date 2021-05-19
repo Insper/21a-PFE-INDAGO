@@ -129,6 +129,7 @@ void* mainThread(void *arg0)
 
     query query;
     unsigned int query_response = 0;
+    unsigned int n=0;
     GPIO_write(HAMBURGER_PIN, 0);
 
     if (Timer_start(timer0) == Timer_STATUS_ERROR)
@@ -158,15 +159,16 @@ void* mainThread(void *arg0)
         //         }
         //     }
 
-       // }
+        // }
         //GPIO_toggle(HAMBURGER_PIN);
-        unsigned int n;
-        int erro = fm0_decoder(TARI, &query_response, &n , DIGITAL_RX, 0);
+        //unsigned int n;
+        //int erro = fm0_decoder(TARI, &query_response, &n , DIGITAL_RX, 0);
 
-        if(erro)
-            usleep(10);
-        else
-            fm0_encoder(query_response, n, TARI, DIGITAL_TX, 0);
+        fm0_encoder(0b1111001010, 10, TARI, DIGITAL_TX, 0);
+        sleep(2);
+
+        //fm0_encoder(0b111100001010, 12, TARI, DIGITAL_TX, 0);
+        //_usleep(3000000);
 
 
         //sprintf(papa, "DT: %d\r\n", dt);

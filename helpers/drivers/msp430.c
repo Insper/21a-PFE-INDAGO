@@ -35,10 +35,6 @@ unsigned int _GPIO_read(unsigned short pin, unsigned char port)
 
 unsigned int _change_edge(int edge, unsigned short pin_rx, unsigned char port)
 {
-    if (edge)
-        GPIO_selectInterruptEdge(port, pin_rx ,GPIO_HIGH_TO_LOW_TRANSITION);
-    else
-        GPIO_selectInterruptEdge(port, pin_rx ,GPIO_LOW_TO_HIGH_TRANSITION);
-
+    GPIO_selectInterruptEdge(port, pin_rx, !edge);
     return !edge;
 }

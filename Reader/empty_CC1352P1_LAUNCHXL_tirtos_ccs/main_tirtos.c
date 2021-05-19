@@ -44,7 +44,7 @@
 
 #include <ti/drivers/Board.h>
 
-extern void *mainThread(void *arg0);
+extern void* mainThread(void *arg0);
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE    1024
@@ -54,10 +54,10 @@ extern void *mainThread(void *arg0);
  */
 int main(void)
 {
-    pthread_t           thread;
-    pthread_attr_t      attrs;
-    struct sched_param  priParam;
-    int                 retc;
+    pthread_t thread;
+    pthread_attr_t attrs;
+    struct sched_param priParam;
+    int retc;
 
     Board_init();
 
@@ -69,15 +69,21 @@ int main(void)
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
     retc |= pthread_attr_setstacksize(&attrs, THREADSTACKSIZE);
-    if (retc != 0) {
+    if (retc != 0)
+    {
         /* failed to set attributes */
-        while (1) {}
+        while (1)
+        {
+        }
     }
 
     retc = pthread_create(&thread, &attrs, mainThread, NULL);
-    if (retc != 0) {
+    if (retc != 0)
+    {
         /* pthread_create() failed */
-        while (1) {}
+        while (1)
+        {
+        }
     }
 
     BIOS_start();

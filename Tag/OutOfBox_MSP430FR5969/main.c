@@ -130,17 +130,22 @@ int main(void)
 
     unsigned int query_response = 0;
 
-    unsigned int n;
+    unsigned int n = 0;
     //unsigned short random_number = rn16_generate();
     __delay_cycles(10000000);
-    fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
+    //fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
     while (1)
     {
+        //unsigned int erro = fm0_decoder(TARI, &query_response, &n , GPIO_PIN2, GPIO_PORT_P4);
+        //_usleep(100000);
+        //if(erro)
+        //__delay_cycles(10000000);
+        //fm0_encoder(0b11001010, 8, TARI, GPIO_PIN6, GPIO_PORT_P2);
+
         unsigned int erro = fm0_decoder(TARI, &query_response, &n , GPIO_PIN2, GPIO_PORT_P4);
-        __delay_cycles(10000000);
-        if(erro)
-            __delay_cycles(100);
-        fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
+        if(!erro)
+            fm0_encoder(query_response, n, TARI, GPIO_PIN6, GPIO_PORT_P2);
+
 
         //char str[] = "teste ";
         //send_uart(&str);
@@ -204,7 +209,7 @@ void Init_GPIO()
     TA0CTL = TASSEL_2 + ID_0 + MC_1;
 
     __enable_interrupt();
-    TA0CCR0 = 795; // Magia , FAVOR NÃO ALTERAR
+    TA0CCR0 = 795; // Magia , FAVOR Nï¿½O ALTERAR
 }
 
 /*
