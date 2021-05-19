@@ -137,11 +137,11 @@ void* mainThread(void *arg0)
     params.timerCallback = timre_callback;
     timer0 = Timer_open(CONFIG_TIMER_0, &params);
 
-    query query;
-    ack ack;
-    rn16 rn16;
-    req_rn req_rn;
-    nak nak;
+    query _query;
+    ack _ack;
+    rn16 _rn16;
+    req_rn _req_rn;
+    nak _nak;
 
     unsigned int query_response = 0;
     unsigned int ack_response = 0;
@@ -167,9 +167,9 @@ void* mainThread(void *arg0)
                 break;
 
             case send_query:
-                query_init(&query, 0, 0, 0, 1, 0, 0, 0);
-                query_build(&query);
-                fm0_encoder(query.result_data, query.size, TARI, DIGITAL_TX, 0);
+                query_init(&_query, 0, 0, 0, 1, 0, 0, 0);
+                query_build(&_query);
+                fm0_encoder(_query.result_data, _query.size, TARI, DIGITAL_TX, 0);
                 COMMUNICATION_STATE = receive_rn16;
                 break;
 
@@ -178,16 +178,16 @@ void* mainThread(void *arg0)
                 if (comm_error || query_response_size!=16)
                     COMMUNICATION_STATE = error;
                 else {
-                    rn16.value = query_response;
-                    rn16.size = query_response_size;
+                    _rn16.value = query_response;
+                    _rn16.size = query_response_size;
                     COMMUNICATION_STATE = send_ack;
                 }
                 break;
 
             case send_ack:
-                ack_init(&ack, rn16.value);
-                ack_build(&ack);
-                fm0_encoder(ack.result_data, ack.size, TARI, DIGITAL_TX, 0);
+                ack_init(&_ack, _rn16.value);
+                ack_build(&_ack);
+                fm0_encoder(_ack.result_data, _ack.size, TARI, DIGITAL_TX, 0);
                 COMMUNICATION_STATE = receive_pc;
                 break;
             
@@ -200,9 +200,9 @@ void* mainThread(void *arg0)
                 break;
 
             case send_req_rn:
-                req_rn_init(&req_rn, rn16.value, 0x10);
-                req_rn_build(&req_rn);
-                fm0_encoder(req_rn.result_data, req_rn.size, TARI, DIGITAL_TX, 0);
+                req_rn_init(&_req_rn, _rn16.value, 0x10);
+                req_rn_build(&_req_rn);
+                fm0_encoder(_req_rn.result_data, _req_rn.size, TARI, DIGITAL_TX, 0);
                 COMMUNICATION_STATE = receive_handle;
                 break;
 
@@ -216,9 +216,9 @@ void* mainThread(void *arg0)
             
             case send_command:
                 // Initiate communication
-                nak_init(&nak);
-                nak_build(&nak);
-                fm0_encoder(nak.result_data, nak.size, TARI, DIGITAL_TX, 0);
+                nak_init(&_nak);
+                nak_build(&_nak);
+                fm0_encoder(_nak.result_data, _nak.size, TARI, DIGITAL_TX, 0);
                 COMMUNICATION_STATE = start;
                 break;
 

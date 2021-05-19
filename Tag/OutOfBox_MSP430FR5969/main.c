@@ -56,6 +56,19 @@ volatile unsigned int dt = 0;
 volatile unsigned int reading_timer = 0;
 volatile unsigned int resultante_tempo = 0;
 
+enum
+{
+    start,
+    receive_query,
+    send_rn16,
+    receive_ack,
+    send_pc,
+    receive_req_rn,
+    send_handle,
+    receive_command,
+    error,
+} COMMUNICATION_STATE;
+
 
 uint8_t RXData = 0;                               // UART Receive byte
 int mode = 0;                                     // mode selection variable
@@ -128,42 +141,114 @@ int main(void)
     Init_Clock();
     Init_UART();
 
-    unsigned int query_response = 0;
-
     unsigned int n = 0;
     //unsigned short random_number = rn16_generate();
     __delay_cycles(10000000);
-    //fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
+
+    query _query;
+    rn16 _rn16;
+    rn16 rn16_2;
+    rn16 handle;
+    ack _ack;
+    req_rn _req_rn;
+
+    unsigned int query_response = 0;
+    unsigned int ack_response = 0;
+    unsigned int req_rn_response = 0;
+    unsigned int command_response = 0;
+    
+    unsigned int query_response_size = 0;
+    unsigned int ack_response_size = 0;
+    unsigned int req_rn_response_size = 0;
+    unsigned int command_response_size = 0;
+
+    int comm_error = 0;
+    COMMUNICATION_STATE = start;
     while (1)
     {
-        //unsigned int erro = fm0_decoder(TARI, &query_response, &n , GPIO_PIN2, GPIO_PORT_P4);
-        //_usleep(100000);
-        //if(erro)
-        //__delay_cycles(10000000);
-        //fm0_encoder(0b11001010, 8, TARI, GPIO_PIN6, GPIO_PORT_P2);
 
-        unsigned int erro = fm0_decoder(TARI, &query_response, &n , GPIO_PIN2, GPIO_PORT_P4);
-        if(!erro)
-            fm0_encoder(query_response, n, TARI, GPIO_PIN6, GPIO_PORT_P2);
+        switch (COMMUNICATION_STATE)
+        {
+            case start:
+                COMMUNICATION_STATE = receive_query;
+                break;
 
+            case receive_query:
+                comm_error = fm0_decoder(TARI, &query_response, &query_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                if (comm_error)
+                    COMMUNICATION_STATE = error;
+                else { 
+                    _query.result_data = query_response;
+                    _query.size = query_response_size;
+                    // process data
+                    COMMUNICATION_STATE = send_rn16;
+                }
+                break;
 
-        //char str[] = "teste ";
-        //send_uart(&str);
-        //GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        //__delay_cycles(10000000);
-        //fm0_encoder(0b111100001010, 12, TARI, GPIO_PIN6, GPIO_PORT_P2);
-        //__delay_cycles(100000000);// if (hora_da_leitura)
-        // {
-        //     GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-        //     fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
-        //     //__delay_cycles(1000000);
-        //     fm0_encoder(random_number, 16, TARI, GPIO_PIN6, GPIO_PORT_P2);
-        //     hora_da_leitura = 0;
-        //     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-        //     GPIO_clearInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-        //     GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-        //     GPIO_enableInterrupt(GPIO_PORT_P2, GPIO_PIN5);
-        // }
+            case send_rn16:
+                _rn16.value = rn16_generate();
+                _rn16.size = 16;
+                fm0_encoder(_rn16.value, _rn16.size, TARI, GPIO_PIN6, GPIO_PORT_P2);
+                COMMUNICATION_STATE = receive_ack;
+                break;
+
+            case receive_ack:
+                comm_error = fm0_decoder(TARI, &ack_response, &ack_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                if (comm_error)
+                    COMMUNICATION_STATE = error;
+                else { 
+                    _ack.result_data = ack_response;
+                    _ack.size = ack_response_size;
+                    // process data
+                    COMMUNICATION_STATE = send_pc;
+                }
+                break;
+            
+            case send_pc:
+                rn16_2.value = rn16_generate();
+                rn16_2.size = 16;
+                fm0_encoder(rn16_2.value, rn16_2.size, TARI, GPIO_PIN6, GPIO_PORT_P2);
+                COMMUNICATION_STATE = receive_req_rn;
+                break;
+
+            case receive_req_rn:
+                comm_error = fm0_decoder(TARI, &req_rn_response, &req_rn_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                if (comm_error)
+                    COMMUNICATION_STATE = error;
+                else { 
+                    _req_rn.result_data = req_rn_response;
+                    _req_rn.size = req_rn_response_size;
+                    // process data
+                    COMMUNICATION_STATE = send_pc;
+                }
+                break;
+
+            case send_handle:
+                handle.value = rn16_generate();
+                handle.size = 16;
+                fm0_encoder(handle.value, handle.size, TARI, GPIO_PIN6, GPIO_PORT_P2);
+                COMMUNICATION_STATE = receive_command;
+                break;
+            
+            case receive_command:
+                // Initiate communication
+                comm_error = fm0_decoder(TARI, &command_response, &command_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                if (comm_error)
+                    COMMUNICATION_STATE = error;
+                else { 
+                    // process data
+                    COMMUNICATION_STATE = start;
+                }
+                break;
+
+            case error:
+                COMMUNICATION_STATE = start;
+                break;
+
+            default:
+                COMMUNICATION_STATE = error;
+                break;
+        }
     }
 }
 
