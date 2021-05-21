@@ -28,7 +28,7 @@ void query_build(query *query)
     query->result_data |= (query->target << 4);
     query->result_data |= query->q;
 
-    query->crc = crc5(query->result_data, INITIAL_REMAINDER_5, POLYNOMIAL_5);
+    query->crc = crc5(query->result_data);
 
     query->result_data <<= 5;
     query->result_data |= (query->crc);

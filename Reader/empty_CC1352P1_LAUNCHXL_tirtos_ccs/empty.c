@@ -150,7 +150,6 @@ void* mainThread(void *arg0)
     unsigned int query_response_size = 0;
     unsigned int ack_response_size = 0;
     unsigned int req_rn_response_size = 0;
-
     int comm_error = 0;
     
     if (Timer_start(timer0) == Timer_STATUS_ERROR) { while (1){} }
@@ -163,6 +162,7 @@ void* mainThread(void *arg0)
         switch (COMMUNICATION_STATE)
         {
             case start:
+                _usleep(1000000);
                 COMMUNICATION_STATE = send_query;
                 break;
 
@@ -200,7 +200,7 @@ void* mainThread(void *arg0)
                 break;
 
             case send_req_rn:
-                req_rn_init(&_req_rn, _rn16.value, 0x10);
+                req_rn_init(&_req_rn, _rn16.value);
                 req_rn_build(&_req_rn);
                 fm0_encoder(_req_rn.result_data, _req_rn.size, TARI, DIGITAL_TX, 0);
                 COMMUNICATION_STATE = receive_handle;

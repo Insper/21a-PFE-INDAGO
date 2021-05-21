@@ -27,8 +27,9 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
 
     int state = start;
 
+    READING = 0;
     resultante_tempo = 0;
-
+    dt=0;
     while (1)
     {
         switch (state)
@@ -38,7 +39,6 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             {
                 READING = 0;
                 edge = _change_edge(edge, pin_rx, port_rx);
-                dt = 0;
                 state = read;
             } else if (dt>timeout) {
                 state = erro;
@@ -65,7 +65,7 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             }
 
             // fim da transmissao ou erro?
-            if (dt * 100 > 5 * tari)
+            if (dt * 100 > 6 * tari)
             {
                 if (veioDoUm == 1)
                 {
@@ -115,7 +115,6 @@ int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short
             return (1);
         default:
             state = erro;
-            return (1);
             break;
         }
     }
