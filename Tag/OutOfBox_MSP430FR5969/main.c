@@ -49,7 +49,7 @@
 #include "main_includes.h"
 #include <msp430.h>
 
-
+volatile rn16 HANDLE = 0;
 volatile char STATE = 0;
 volatile char READING = 0;
 volatile unsigned int dt = 0;
@@ -58,6 +58,14 @@ volatile unsigned int resultante_tempo = 0;
 
 enum
 {
+    READY,
+    ARBITRATE,
+    REPLY,
+    ACKNOWLEDGED,
+    OPEN,
+    SECURED,
+    KILLED,
+    /*
     start,
     receive_query,
     send_rn16,
@@ -66,7 +74,7 @@ enum
     receive_req_rn,
     send_handle,
     receive_command,
-    error,
+    error,*/
 } COMMUNICATION_STATE;
 
 
@@ -130,6 +138,15 @@ void send_bits_uart(int package, int size)
     }
     send_uart("\r\n");
 }
+
+int getRealHandlerId(int id, commandHandler *commandsHandler ){
+    for (int i = 0; i < 128; i++){
+        if(commandsHandler.id == id){
+            return(i);
+        }
+    }
+}
+
 /*
  * main.c
  */
@@ -152,15 +169,26 @@ int main(void)
     ack _ack;
     req_rn _req_rn;
 
-    unsigned int query_response = 0;
-    unsigned int ack_response = 0;
-    unsigned int req_rn_response = 0;
-    unsigned int command_response = 0;
+    // unsigned int query_response = 0;
+    // unsigned int ack_response = 0;
+    // unsigned int req_rn_response = 0;
+    // unsigned int command_response = 0;
     
-    unsigned int query_response_size = 0;
-    unsigned int ack_response_size = 0;
-    unsigned int req_rn_response_size = 0;
-    unsigned int command_response_size = 0;
+    // unsigned int query_response_size = 0;
+    // unsigned int ack_response_size = 0;
+    // unsigned int req_rn_response_size = 0;
+    // unsigned int command_response_size = 0;
+
+    unsigned long command_received = 0;
+    unsigned int command_received_size = 0;
+    
+    // forma 1
+    commandHandler commandsHandler[198];
+    commandsHandler[ACK_COMMAND] = &ackCommand;
+    commandHandler *handler;
+
+    // forma 2
+    commandsHandler[0] = &ackCommand;
 
     int comm_error = 0;
     COMMUNICATION_STATE = start;
@@ -169,6 +197,63 @@ int main(void)
 
         switch (COMMUNICATION_STATE)
         {
+            case READY:
+                comm_error = fm0_decoder(TARI, &command_received, &command_received_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                if (comm_error)
+                    COMMUNICATION_STATE = ERROR;
+                else {         
+                    id = process_data(command_received, command_received_size, COMMUNICATION_STATE);
+                    handler = commandsHandler[id];
+                    handler = process_data(...)
+                    status = handler->process(command_received);
+                    switch (id)
+                    {
+                    case ACK_COMMAND:
+
+                        /* code */
+                        break;
+                    
+                    default:
+                        break;
+                    }
+
+
+                    if (status) {
+
+                    }
+                    handler->reply(command_received)
+                    stateNext = handler->state()
+
+                }
+
+                break;
+
+            case ARBITRATE:
+                break;
+            case REPLY:
+                break;
+            case ACKNOWLEDGED:
+                break;
+            case OPEN:
+                break;
+            case SECURED:
+                break;
+            case KILLED:
+                break;
+            default:
+                STATE = READY;
+                break;
+
+
+
+
+
+
+
+
+
+
+            /*
             case start:
                 COMMUNICATION_STATE = receive_query;
                 break;
@@ -248,7 +333,9 @@ int main(void)
             default:
                 COMMUNICATION_STATE = error;
                 break;
+        */
         }
+        
     }
 }
 

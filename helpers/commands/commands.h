@@ -1,4 +1,5 @@
 // Mandatory Commands
+#include "rn16.h"
 #include "query_rep.h"
 #include "ack.h"
 #include "query.h"
@@ -10,4 +11,4 @@
 #include "write.h"
 #include "kill.h"
 #include "lock.h"
-#include "rn16.h"
+

@@ -1,10 +1,14 @@
 #ifndef QUERY_H
 #define QUERY_H
 #include "../config.h"
+#include "./rn16.h"
 #include "../crc.h"
+
 
 #define QUERY_COMMAND 0b1000
 #define QUERY_SIZE 22
+
+extern volatile rn16 HANDLE;
 
 typedef struct
 {

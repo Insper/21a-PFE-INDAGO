@@ -33,3 +33,76 @@ void query_build(query *query)
     query->result_data <<= 5;
     query->result_data |= (query->crc);
 }
+
+int query_process(unsigned long *command, unsigned int command_size, int STATE, unsigned short pin_tx,
+                  unsigned char port_tx)
+{
+    if (command_size != QUERY_SIZE)
+    {
+        return READY;
+    }
+
+    query _query;
+    _query.crc = *command & 0b11111;
+    _query.q = (*command >> 5) & 0b1111;
+    _query.target = (*command >> 9) & 1;
+    _query.session = (*command >> 10) & 0b11;
+    _query.sel = (*command >> 12) & 0b11;
+    _query.trext = (*command >> 14) & 0b1;
+    _query.m = (*command >> 15) & 0b11;
+    _query.dr = (*command >> 17) & 0b1;
+
+    if (crc5(*command >> 5) != _query.crc)
+    {
+        return READY;
+    }
+
+    switch (STATE)
+    {
+    case READY:
+        HANDLE.value = rn16_generate();
+        HANDLE.size = 16;
+        fm0_encoder(HANDLE.value, HANDLE.size, TARI, pin_tx, port_tx);
+        return REPLY;
+        break;
+
+    case ARBITRATE:
+        HANDLE.value = rn16_generate();
+        HANDLE.size = 16;
+        fm0_encoder(HANDLE.value, HANDLE.size, TARI, pin_tx, port_tx);
+        return REPLY;
+        break;
+
+    case REPLY:
+        HANDLE.value = rn16_generate();
+        HANDLE.size = 16;
+        fm0_encoder(HANDLE.value, HANDLE.size, TARI, pin_tx, port_tx);
+        return REPLY;
+        break;
+        
+    case ACKNOWLEDGED:
+        HANDLE.value = rn16_generate();
+        HANDLE.size = 16;
+        fm0_encoder(HANDLE.value, HANDLE.size, TARI, pin_tx, port_tx);
+        return REPLY;
+        break;
+    case OPEN:
+        HANDLE.value = rn16_generate();
+        HANDLE.size = 16;
+        fm0_encoder(HANDLE.value, HANDLE.size, TARI, pin_tx, port_tx);
+        return REPLY;
+        break;
+    case SECURED:
+        HANDLE.value = rn16_generate();
+        HANDLE.size = 16;
+        fm0_encoder(HANDLE.value, HANDLE.size, TARI, pin_tx, port_tx);
+        return REPLY;
+        break;
+    case KILLED:
+        return KILLED;
+        break;
+    default:
+        return READY;
+        break;
+    }
+}
