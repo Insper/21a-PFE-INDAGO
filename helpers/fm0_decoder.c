@@ -11,7 +11,7 @@ enum
     fim
 } state;
 
-int fm0_decoder(int tari, unsigned int *payload, unsigned int *n, unsigned short pin_rx,
+int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned short pin_rx,
                 unsigned char port_rx, unsigned int timeout)
 {
 

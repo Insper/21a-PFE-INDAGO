@@ -14,5 +14,6 @@ typedef struct
 
 void ack_init(ack *ack, unsigned short rn);
 void ack_build(ack *ack);
+int ack_validate(unsigned long *command, unsigned int command_size);
 
 #endif /* ACK_H */

@@ -25,4 +25,6 @@ void query_init(query *query, unsigned char dr, unsigned char m,
                 unsigned char target, unsigned char q);
 void query_build(query *query);
 
+int query_validate(unsigned long *command, unsigned int command_size);
+
 #endif /* QUERY_H */

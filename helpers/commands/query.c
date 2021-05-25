@@ -33,3 +33,14 @@ void query_build(query *query)
     query->result_data <<= 5;
     query->result_data |= (query->crc);
 }
+
+int query_validate(unsigned long *command, unsigned int command_size){
+    if(((*command>>18) & 0b11111)!=QUERY_COMMAND){
+        return 0;
+    }
+
+    unsigned char ccr = crc5(*command>>5);
+    unsigned char ccr2 = (*command & 0b11111);
+    int res = (ccr==ccr2);
+    return res;
+}

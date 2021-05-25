@@ -37,7 +37,7 @@ static void fm0_encode1(int tari, unsigned short pin_tx, unsigned char port_tx)
  *  @param      pin_tx   pin board int to send the signal
  *  @param      tari     tari value to properly send the signal
  */
-void fm0_encoder(int package, int size, int tari, unsigned short pin_tx,
+void fm0_encoder(long long package, int size, int tari, unsigned short pin_tx,
                  unsigned char port_tx)
 {
     int i;

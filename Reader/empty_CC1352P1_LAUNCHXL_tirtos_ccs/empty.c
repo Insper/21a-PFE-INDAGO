@@ -143,9 +143,9 @@ void* mainThread(void *arg0)
     req_rn _req_rn;
     nak _nak;
 
-    unsigned int query_response = 0;
+    unsigned long query_response = 0;
     unsigned int ack_response = 0;
-    unsigned int req_rn_response = 0;
+    unsigned long long req_rn_response = 0;
     
     unsigned int query_response_size = 0;
     unsigned int ack_response_size = 0;
@@ -153,6 +153,7 @@ void* mainThread(void *arg0)
     int comm_error = 0;
     
     if (Timer_start(timer0) == Timer_STATUS_ERROR) { while (1){} }
+    crc_16_ccitt_init();
 
     char papa[32];
     // UART_write(uart, "Vai comecar: ", sizeof("Vai comecar: "));
