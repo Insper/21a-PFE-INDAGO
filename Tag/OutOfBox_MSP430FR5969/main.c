@@ -57,6 +57,20 @@ volatile unsigned int resultante_tempo = 0;
 
 enum
 {
+    /*
+     * READY
+     * ARBITRATE
+     * REPLY
+     * ACKNOWLEDGED
+     * OPEN
+     * SECURED
+     * KILLED
+     */
+
+
+
+
+
     start,
     receive_query,
     send_rn16,
@@ -133,6 +147,7 @@ int main(void)
 {
 
     // Board initializations
+    _system_pre_init();
     Init_GPIO();
     Init_Clock();
     Init_UART();

@@ -38,6 +38,9 @@ int query_validate(unsigned long *command, unsigned int command_size){
     if(((*command>>18) & 0b11111)!=QUERY_COMMAND){
         return 0;
     }
+    if(command_size!=QUERY_SIZE){
+        return 0;
+    }
 
     unsigned char ccr = crc5(*command>>5);
     unsigned char ccr2 = (*command & 0b11111);
