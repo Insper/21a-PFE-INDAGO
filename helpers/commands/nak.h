@@ -12,5 +12,6 @@ typedef struct
 } nak;
 void nak_init(nak *nak);
 void nak_build(nak *nak);
+int nak_validate(unsigned long long *command, unsigned int command_size);
 
 #endif /* NAK_H */
