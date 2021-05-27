@@ -16,10 +16,10 @@
  * expressed or implied by its publication or distribution.
  * 
  * The functions were modified to fit the project specifications
-**********************************************************************/
+ **********************************************************************/
 #include "crc.h"
 
-crc16  crc_table[256];
+crc16 crc_table[256];
 
 /*********************************************************************
  *
@@ -33,24 +33,30 @@ crc16  crc_table[256];
  *
  * Returns:		None defined.
  *
-*********************************************************************/
-void crc_16_ccitt_init(unsigned short polynomial) {
-    crc16	 remainder;
-	int		 dividend;
-	unsigned char bit;
+ *********************************************************************/
+void crc_16_ccitt_init(void)
+{
+    unsigned short polynomial = POLYNOMIAL_16;
+    crc16 remainder;
+    int dividend;
+    unsigned char bit;
 
     // Compute the remainder of each possible dividend.
-    for (dividend = 0; dividend < 256; ++dividend) {
+    for (dividend = 0; dividend < 256; ++dividend)
+    {
         // Start with the dividend followed by zeros.
         remainder = dividend << 8;
 
         // Perform modulo-2 division, a bit at a time.
-        for (bit = 8; bit > 0; --bit) {
+        for (bit = 8; bit > 0; --bit)
+        {
             //	Try to divide the current data bit.
-            if (remainder & 0x8000) {
+            if (remainder & 0x8000)
+            {
                 remainder = (remainder << 1) ^ polynomial;
             }
-            else {
+            else
+            {
                 remainder = (remainder << 1);
             }
         }
@@ -59,7 +65,6 @@ void crc_16_ccitt_init(unsigned short polynomial) {
         crc_table[dividend] = remainder;
     }
 }
-
 
 /*********************************************************************
  *
@@ -72,29 +77,37 @@ void crc_16_ccitt_init(unsigned short polynomial) {
  * Returns:		The CRC of the message.
  *
  *********************************************************************/
-crc16 crc_16_ccitt(unsigned char const message[], int n_bytes, crc16 remainder) {
-    unsigned char  data;
-	int      byte;
+crc16 crc_16_ccitt(const unsigned long message, int n_bytes)
+{
+    crc16 remainder = INITIAL_REMAINDER_16;
+    unsigned char data;
+    int byte;
+    unsigned char tmp;
 
     // Divide the message by the polynomial, a byte at a time.
-    for (byte = 0; byte < n_bytes; ++byte) {
-        data = message[byte] ^ (remainder >> 8);
-  		remainder = crc_table[data] ^ (remainder << 8);
+    for (byte = 0; byte < n_bytes; ++byte)
+    {
+        tmp = (message >> (byte * 8)) & 0b11111111;
+        data = tmp ^ (remainder >> 8);
+        remainder = crc_table[data] ^ (remainder << 8);
     }
 
     // The final remainder is the CRC.
     return remainder;
 }
 
-
-unsigned char crc5(unsigned char const message, unsigned char remainder, unsigned char polynomial) {
+unsigned char crc5(unsigned char const message)
+{
+    unsigned char remainder = INITIAL_REMAINDER_5;
+    unsigned char polynomial = POLYNOMIAL_5;
     unsigned char bit;
 
     // For each bit position in the message....
     for (bit = 8; bit > 0; --bit)
     {
         // If the uppermost bit is a 1...
-        if (remainder & 0x80) {
+        if (remainder & 0x80)
+        {
             // XOR the previous remainder with the divisor.
             remainder ^= polynomial;
         }

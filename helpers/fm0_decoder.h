@@ -4,6 +4,20 @@
 #ifndef FM0_DECODER_H
 #define FM0_DECODER_H
 
-void fm0_decoder(int tari, int *package, unsigned short pin_rx, unsigned char port_rx);
+typedef struct
+{
+    int tari;
+    unsigned char pin_rx;
+    unsigned char port_rx;
+    unsigned int timeout;
+} decoder_driver;
+
+extern volatile char READING;
+extern volatile unsigned int dt;
+extern volatile unsigned int reading_timer;
+extern volatile unsigned int delta_time;
+
+int fm0_decoder(unsigned long long *payload, unsigned int *n,
+                decoder_driver driver);
 
 #endif /* FM0_DECODER_H */

@@ -28,7 +28,7 @@
 #define INITIAL_REMAINDER_5 0x9
 
 typedef unsigned short  crc16;
-void crc_16_ccitt_init(unsigned short polynomial);
-crc16 crc_16_ccitt(const unsigned char message[], int n_bytes, crc16	 remainder);
-unsigned char crc5(const unsigned char message, unsigned char  remainder, unsigned char  polynomial);
+void crc_16_ccitt_init(void);
+crc16 crc_16_ccitt(const unsigned long message, int n_bytes);
+unsigned char crc5(unsigned char const message);
 #endif /* CRC_H */

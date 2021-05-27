@@ -28,6 +28,7 @@ GPIO1.pinInstance.$name = "CONFIG_PIN_1";
 
 GPIO2.$name             = "DIGITAL_TX";
 GPIO2.mode              = "Output";
+GPIO2.gpioPin.$assign   = "boosterpack.24";
 GPIO2.pinInstance.$name = "CONFIG_PIN_2";
 
 const CCFG              = scripting.addModule("/ti/devices/CCFG", {}, false);
@@ -46,7 +47,6 @@ UART1.rxPinInstance.$name = "CONFIG_PIN_2_";
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
  * re-solve from scratch.
  */
-GPIO2.gpioPin.$suggestSolution              = "boosterpack.10";
 Timer1.timerInstance.timer.$suggestSolution = "GPTM0";
 UART1.uart.$suggestSolution                 = "UART0";
 UART1.uart.txPin.$suggestSolution           = "boosterpack.4";

@@ -43,29 +43,31 @@
 #define MSP430
 
 #include "main.h"
-#include "LiveTempMode.h"
-#include "FRAMLogMode.h"
 #include "driverlib.h"
 #include "main_includes.h"
+#include <msp430.h>
 
-uint8_t RXData = 0;                               // UART Receive byte
-int mode = 0;                                     // mode selection variable
-int pingHost = 0;                                 // ping request from PC GUI
-Calendar calendar;                                // Calendar used for RTC
+volatile char STATE = 0;
+volatile char READING = 0;
+volatile unsigned int dt = 0;
+volatile unsigned int reading_timer = 0;
+volatile unsigned int delta_time = 0;
+
+enum
+{
+    READY, ARBITRATE, REPLY, ACKNOWLEDGED, OPEN, SECURED, KILLED, ERROR,
+} COMMUNICATION_STATE;
 
 #if defined(__IAR_SYSTEMS_ICC__)
 #pragma location = 0x9000
 __no_init uint16_t dataArray[12289];
 #endif
 
-
-int hora_da_leitura = 0;
-
 //-----------------------------------------------------------------------------
 int _system_pre_init(void)
 {
     // Stop Watchdog timer
-    WDT_A_hold(__MSP430_BASEADDRESS_WDT_A__);     // Stop WDT
+    WDT_A_hold(__MSP430_BASEADDRESS_WDT_A__); // Stop WDT
 
     /*==================================*/
     /* Choose if segment initialization */
@@ -76,83 +78,157 @@ int _system_pre_init(void)
     return 1;
 }
 
-
-void send_uart(char* str) {
-    GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN0, GPIO_SECONDARY_MODULE_FUNCTION);
-                __delay_cycles(900000);
-                //int i;
-                while(*str != 0){
-                    EUSCI_A_UART_transmitData(EUSCI_A0_BASE, *str++);
-
-                    __delay_cycles(10000);
-
-                }
-
-                GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0);
-                GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0);
-}
 /*
  * main.c
  */
-int main(void) {
-
-    // Check if a wakeup from LPMx.5
-    if (SYSRSTIV == SYSRSTIV_LPM5WU) {
-    	// Button S2 pressed
-        if (P1IFG & BIT1)
-        {
-        	// Clear P1.1 interrupt flag
-        	GPIO_clearInterrupt(GPIO_PORT_P1, GPIO_PIN0);
-
-        	// Exit FRAM Log Mode
-        	mode = '0';
-
-        	// Light up LED1 to indicate Exit from FRAM mode
-        	Init_GPIO();
-        	GPIO_setOutputHighOnPin(GPIO_PORT_P4, GPIO_PIN2);
-        	__delay_cycles(600000);
-        }
-        else
-        {
-        	// Continue FRAM data logging
-            mode = FRAM_LOG_MODE;
-            Init_GPIO();
-        }
-    }
-    else
-    {
-    	Init_GPIO();
-    	GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN0);
-
-    	// Toggle LED1 and LED2 to indicate OutOfBox Demo start
-    	int i;
-    	for (i=0;i<10;i++)
-    	{
-            GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            GPIO_toggleOutputOnPin(GPIO_PORT_P4, GPIO_PIN2);
-            __delay_cycles(200000);
-    	}
-    }
+int main(void)
+{
 
     // Board initializations
+    _system_pre_init();
     Init_GPIO();
     Init_Clock();
-    Init_UART();
 
-    unsigned int query_response = 0;
-    while(1) {
-        //char str[] = "teste ";
-        //send_uart(&str);
-        //GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
+    // Encoder Driver
+    encoder_driver tx_driver;
+    tx_driver.port_tx = GPIO_PORT_P2;
+    tx_driver.pin_tx = GPIO_PIN6;
+    tx_driver.tari = TARI;
 
-        if (hora_da_leitura) {
-            GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
-            fm0_decoder(TARI, &query_response, GPIO_PIN2, GPIO_PORT_P4);
-            //__delay_cycles(1000000);
-            fm0_encoder(0b1010, 4, TARI, GPIO_PIN6, GPIO_PORT_P2);
-            hora_da_leitura=0;
-            GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-            GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+    // Decoder Driver
+    decoder_driver rx_driver;
+    rx_driver.port_rx = GPIO_PORT_P4;
+    rx_driver.pin_rx = GPIO_PIN2;
+    rx_driver.tari = TARI;
+    rx_driver.timeout = COMMUNICATION_TIMEOUT;
+
+    unsigned int n = 0;
+    //unsigned short random_number = rn16_generate();
+    __delay_cycles(10000000);
+
+    query _query;
+    rn16 _rn16;
+    rn16 rn16_2;
+    rn16 handle;
+    ack _ack;
+    req_rn _req_rn;
+
+    unsigned long query_response = 0;
+    unsigned int ack_response = 0;
+    unsigned long long req_rn_response = 0;
+    unsigned int command_response = 0;
+
+    unsigned int query_response_size = 0;
+    unsigned int ack_response_size = 0;
+    unsigned int req_rn_response_size = 0;
+    unsigned int command_response_size = 0;
+    int res = 0;
+    int rr = 0;
+    unsigned char ccr;
+    unsigned char ccr2;
+    int comm_error = 0;
+
+    crc_16_ccitt_init();
+    COMMUNICATION_STATE = READY;
+    while (1)
+    {
+
+        switch (COMMUNICATION_STATE)
+        {
+
+        case READY:
+            comm_error = fm0_decoder(&query_response, &query_response_size,
+                                     rx_driver);
+            if (comm_error)
+            {
+                COMMUNICATION_STATE = ERROR;
+            }
+
+            res = query_validate(&query_response, query_response_size);
+            if (res)
+            {
+                _rn16.value = rn16_generate();
+                _rn16.size = 16;
+                fm0_encoder(_rn16.value, _rn16.size, tx_driver);
+                COMMUNICATION_STATE = REPLY;
+            }
+            else
+            {
+                COMMUNICATION_STATE = ERROR;
+            }
+
+            break;
+
+        case ARBITRATE:
+            COMMUNICATION_STATE = READY;
+            break;
+
+        case REPLY:
+            comm_error = fm0_decoder(&ack_response, &ack_response_size,
+                                     rx_driver);
+            if (comm_error)
+                COMMUNICATION_STATE = ERROR;
+            else
+            {
+                res = ack_validate(&ack_response, ack_response_size);
+                if (res)
+                {
+                    COMMUNICATION_STATE = ACKNOWLEDGED;
+                    rn16_2.value = rn16_generate();
+                    rn16_2.size = 16;
+                    fm0_encoder(rn16_2.value, rn16_2.size, tx_driver);
+                }
+                else
+                {
+                    COMMUNICATION_STATE = ERROR;
+                }
+            }
+            break;
+        case ACKNOWLEDGED:
+            comm_error = fm0_decoder(&req_rn_response, &req_rn_response_size,
+                                     rx_driver);
+            if (comm_error)
+                COMMUNICATION_STATE = ERROR;
+            else
+            {
+                res = req_rn_validate(&req_rn_response, req_rn_response_size);
+                if (res)
+                {
+                    COMMUNICATION_STATE = OPEN;
+                    handle.value = rn16_generate();
+                    handle.size = 16;
+                    fm0_encoder(handle.value, handle.size, tx_driver);
+                }
+                else
+                {
+                    COMMUNICATION_STATE = ERROR;
+                }
+            }
+            break;
+        case OPEN:
+            comm_error = fm0_decoder(&command_response, &command_response_size,
+                                     rx_driver);
+            if (comm_error)
+                COMMUNICATION_STATE = ERROR;
+            else
+            {
+                res = nak_validate(&command_response, command_response_size);
+                if (res)
+                {
+                    COMMUNICATION_STATE = ARBITRATE;
+
+                }
+                else
+                {
+                    COMMUNICATION_STATE = ERROR;
+                }
+
+            }
+
+            break;
+        case ERROR:
+            COMMUNICATION_STATE = READY;
+            break;
         }
     }
 }
@@ -167,35 +243,39 @@ void Init_GPIO()
     //GPIO_setOutputLowOnPin(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN6);
 
-
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
     GPIO_setAsInputPin(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN6);
 
-	// Configure P2.0 - UCA0TXD and P2.1 - UCA0RXD
-	GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0);
-	GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0);
-    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P2, GPIO_PIN1, GPIO_SECONDARY_MODULE_FUNCTION);
+    // Configure P2.0 - UCA0TXD and P2.1 - UCA0RXD
+    GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0);
+    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0);
+    GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P2, GPIO_PIN1,
+    GPIO_SECONDARY_MODULE_FUNCTION);
 
     // Saet PJ.4 nd PJ.5 as Primary Module Function Input, LFXT.
     GPIO_setAsPeripheralModuleFunctionInputPin(
-           GPIO_PORT_PJ,
-           GPIO_PIN4 + GPIO_PIN5,
-           GPIO_PRIMARY_MODULE_FUNCTION
-           );
+    GPIO_PORT_PJ,
+                                               GPIO_PIN4 + GPIO_PIN5,
+                                               GPIO_PRIMARY_MODULE_FUNCTION);
 
     // Disable the GPIO power-on default high-impedance mode
     // to activate previously configured port settings
     PMM_unlockLPM5();
 
-
-    GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2, GPIO_LOW_TO_HIGH_TRANSITION);
+    GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2,
+    GPIO_LOW_TO_HIGH_TRANSITION);
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
 
-    // Enable global interrupt
+    // initialize Timer0_A
+    TA0CCR0 = 0;
+    TA0CCTL0 |= CCIE;
+    TA0CTL = TASSEL_2 + ID_0 + MC_1;
+
     __enable_interrupt();
+    TA0CCR0 = 795; // Magia , FAVOR N�O ALTERAR
 }
 
 /*
@@ -218,90 +298,22 @@ void Init_Clock()
 }
 
 /*
- * UART Communication Initialization
- */
-void Init_UART()
-{
-    // Configure UART
-    EUSCI_A_UART_initParam param = {0};
-    param.selectClockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK;
-    param.clockPrescalar = 52;
-    param.firstModReg = 1;
-    param.secondModReg = 0x49;
-    param.parity = EUSCI_A_UART_NO_PARITY;
-    param.msborLsbFirst = EUSCI_A_UART_LSB_FIRST;
-    param.numberofStopBits = EUSCI_A_UART_ONE_STOP_BIT;
-    param.uartMode = EUSCI_A_UART_MODE;
-    param.overSampling = EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION;
-
-    if(STATUS_FAIL == EUSCI_A_UART_init(EUSCI_A0_BASE, &param))
-        return;
-
-    EUSCI_A_UART_enable(EUSCI_A0_BASE);
-
-    EUSCI_A_UART_clearInterrupt(EUSCI_A0_BASE,
-                                EUSCI_A_UART_RECEIVE_INTERRUPT);
-
-    // Enable USCI_A0 RX interrupt
-    EUSCI_A_UART_enableInterrupt(EUSCI_A0_BASE,
-                                 EUSCI_A_UART_RECEIVE_INTERRUPT); // Enable interrupt
-
-    // Enable global interrupt
-    __enable_interrupt();
-}
-
-/*
- * Enter Low Power Mode 3.5
- */
-void enterLPM35()
-{
-	// Configure button S2 (P1.1) interrupt
-    GPIO_selectInterruptEdge(GPIO_PORT_P1, GPIO_PIN1, GPIO_HIGH_TO_LOW_TRANSITION);
-    GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P1, GPIO_PIN1);
-    GPIO_clearInterrupt(GPIO_PORT_P1, GPIO_PIN1);
-    GPIO_enableInterrupt(GPIO_PORT_P1, GPIO_PIN1);
-
-    // Request the disabling of the core voltage regulator when device enters
-    // LPM3 (or LPM4) so that we can effectively enter LPM3.5 (or LPM4.5).
-    PMM_turnOffRegulator();
-
-    //Enter LPM3 mode with interrupts enabled
-    __bis_SR_register(LPM4_bits + GIE);
-    __no_operation();
-}
-
-/*
- * USCI_A0 Interrupt Service Routine that receives PC GUI's commands
- */
-#pragma vector = USCI_A0_VECTOR
-__interrupt void USCI_A0_ISR(void)
-{
-	int i;
-    switch (__even_in_range(UCA0IV, USCI_UART_UCTXCPTIFG)) {
-        case USCI_NONE: break;
-        case USCI_UART_UCRXIFG:
-            i = EUSCI_A_UART_receiveData(EUSCI_A0_BASE);
-        	if (i == '5')
-                pingHost = 1;
-            else
-                mode = i;
-            __bic_SR_register_on_exit(LPM3_bits); // Exit active CPU
-            break;
-        case USCI_UART_UCTXIFG: break;
-        case USCI_UART_UCSTTIFG: break;
-        case USCI_UART_UCTXCPTIFG: break;
-    }
-}
-
-
-/*
  * PIN interrupt to read content
  */
 #pragma vector = PORT4_VECTOR
 __interrupt void PIN_RX_ISR(void)
 {
-    GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-    hora_da_leitura = 1;
+    READING = 1;
+    reading_timer = dt;
+    dt = 0;
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
+}
 
+/* 
+ * Timer Interrupt 
+ */
+#pragma vector = TIMER0_A0_VECTOR
+__interrupt void myTimerISR(void)
+{
+    dt = dt + 1;
 }

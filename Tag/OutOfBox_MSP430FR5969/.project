@@ -66,11 +66,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_decoder.c</locationURI>
 		</link>
 		<link>
-			<name>fm0_decoder.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_decoder.h</locationURI>
-		</link>
-		<link>
 			<name>fm0_encoder.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/helpers/fm0_encoder.c</locationURI>

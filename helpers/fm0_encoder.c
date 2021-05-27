@@ -9,11 +9,12 @@
  *  @param      pin_tx   pin board int to send the signal
  *  @param      tari     tari value to properly send the signal
  */
-static void fm0_encode0(int tari, unsigned short pin_tx, unsigned char port_tx){
+static void fm0_encode0(int tari, unsigned short pin_tx, unsigned char port_tx)
+{
     _GPIO_toggle(pin_tx, port_tx);
-    _usleep(tari/2); // microseconds
+    _usleep(tari / 2); // microseconds
     _GPIO_toggle(pin_tx, port_tx);
-    _usleep(tari/2); // microseconds
+    _usleep(tari / 2); // microseconds
 }
 
 /*!
@@ -22,7 +23,8 @@ static void fm0_encode0(int tari, unsigned short pin_tx, unsigned char port_tx){
  *  @param      pin_tx   pin board int to send the signal
  *  @param      tari     tari value to properly send the signal
  */
-static void fm0_encode1(int tari, unsigned short pin_tx, unsigned char port_tx){
+static void fm0_encode1(int tari, unsigned short pin_tx, unsigned char port_tx)
+{
     _GPIO_toggle(pin_tx, port_tx);
     _usleep(tari); // microseconds
 }
@@ -35,14 +37,20 @@ static void fm0_encode1(int tari, unsigned short pin_tx, unsigned char port_tx){
  *  @param      pin_tx   pin board int to send the signal
  *  @param      tari     tari value to properly send the signal
  */
-void fm0_encoder(int package, int size, int tari, unsigned short pin_tx, unsigned char port_tx) {
+void fm0_encoder(long long package, int size, encoder_driver driver)
+{
     int i;
-    for (i=(size-1); i>=0; i--) {
-        if ((package >> i) & 1) {
-        fm0_encode1(tari, pin_tx, port_tx);
-		} else {
-        fm0_encode0(tari, pin_tx, port_tx);
+    for (i = (size - 1); i >= 0; i--)
+    {
+        if ((package >> i) & 1)
+        {
+            fm0_encode1(driver.tari, driver.pin_tx, driver.port_tx);
+        }
+        else
+        {
+            fm0_encode0(driver.tari, driver.pin_tx, driver.port_tx);
         }
     }
-    fm0_encode1(tari, pin_tx, port_tx);
+    fm0_encode1(driver.tari, driver.pin_tx, driver.port_tx);
+    _GPIO_toggle(driver.pin_tx, driver.port_tx);
 }
