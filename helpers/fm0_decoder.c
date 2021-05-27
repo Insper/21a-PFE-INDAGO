@@ -11,8 +11,18 @@ enum
     fim
 } state;
 
-int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned short pin_rx,
-                unsigned char port_rx, unsigned int timeout)
+
+// /************************************************************************/
+// /* functions                                                            */
+// /************************************************************************/
+// /*!
+//  *  @brief Receive FM0 data from decoder_driver and translate and store data to package
+//  *
+//  *  @param      payload package pointer
+//  *  @param      n       package size
+//  *  @param      driver  RX driver
+//  */
+int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver driver)
 {
 
     int c_bit = 0;
@@ -22,8 +32,8 @@ int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned
 
     int veioDoUm = 0;
 
-    edge = _GPIO_read(pin_rx, port_rx);
-    edge = _change_edge(!edge, pin_rx, port_rx);
+    edge = _GPIO_read(driver.pin_rx, driver.port_rx);
+    edge = _change_edge(!edge, driver.pin_rx, driver.port_rx);
 
     int state = start;
 
@@ -38,9 +48,9 @@ int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned
             if (READING)
             {
                 READING = 0;
-                edge = _change_edge(edge, pin_rx, port_rx);
+                edge = _change_edge(edge, driver.pin_rx, driver.port_rx);
                 state = read;
-            } else if (dt>timeout) {
+            } else if (dt>driver.timeout) {
                 state = erro;
             }
             break;
@@ -48,12 +58,12 @@ int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned
             if (READING)
             {
                 READING = 0;
-                edge = _change_edge(edge, pin_rx, port_rx);
-                if ((reading_timer * 100 > (0.65 * tari)) && (reading_timer * 100 < (1.35 * tari)))
+                edge = _change_edge(edge, driver.pin_rx, driver.port_rx);
+                if ((reading_timer * 100 > (0.65 * driver.tari)) && (reading_timer * 100 < (1.35 * driver.tari)))
                 {
                     state = um;
                 }
-                else if (reading_timer * 100 > 0.35 * tari && reading_timer * 100 < 0.65 * tari)
+                else if (reading_timer * 100 > 0.35 * driver.tari && reading_timer * 100 < 0.65 * driver.tari)
                 {
                     state = read_zero;
                 }
@@ -65,7 +75,7 @@ int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned
             }
 
             // fim da transmissao ou erro?
-            if (dt * 100 > 6 * tari)
+            if (dt * 100 > 6 * driver.tari)
             {
                 if (veioDoUm == 1)
                 {
@@ -82,9 +92,9 @@ int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned
             if (READING)
             {
                 READING = 0;
-                edge = _change_edge(edge, pin_rx, port_rx);
+                edge = _change_edge(edge, driver.pin_rx, driver.port_rx);
                 resultante_tempo = reading_timer - dt;
-                if (reading_timer * 100 > 0.35 * tari && reading_timer * 100 < 0.65 * tari)
+                if (reading_timer * 100 > 0.35 * driver.tari && reading_timer * 100 < 0.65 * driver.tari)
                 {
                     state = zero;
                 }
@@ -119,36 +129,3 @@ int fm0_decoder(int tari, unsigned long long *payload, unsigned int *n, unsigned
         }
     }
 }
-
-// /************************************************************************/
-// /* functions                                                            */
-// /************************************************************************/
-// /*!
-//  *  @brief Receive FM0 data from PIN_RX and translate and store data to package
-//  *
-//  *  @param      pin_rx  pin RX
-//  *  @param      tari    tari time
-//  *  @param      package package pointer
-//  */
-// void fm0_decoder(int tari, int *package, unsigned short pin_rx,
-//                  unsigned char port_rx)
-// {
-//     unsigned int actual, last;        // current and last data signal
-
-//     while (1)
-//     {
-//         last = _GPIO_read(pin_rx, port_rx);
-//         _usleep(tari / 2); // microseconds
-//         actual = _GPIO_read(pin_rx, port_rx);
-//         _usleep(tari / 2); // microseconds
-//         *package <<= 1;
-//         if (actual == last)
-//         {
-//             if (_GPIO_read(pin_rx, port_rx) == last)
-//             {
-//                 break;
-//             }
-//             *package |= 1;
-//         }
-//     }
-// }

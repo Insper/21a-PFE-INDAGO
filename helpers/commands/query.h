@@ -20,6 +20,7 @@ typedef struct
     unsigned int size;
     unsigned int result_data;
 } query;
+
 void query_init(query *query, unsigned char dr, unsigned char m,
                 unsigned char trext, unsigned char sel, unsigned char session,
                 unsigned char target, unsigned char q);

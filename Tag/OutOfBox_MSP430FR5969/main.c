@@ -96,6 +96,19 @@ int main(void)
     Init_GPIO();
     Init_Clock();
 
+    // Encoder Driver
+    encoder_driver tx_driver;
+    tx_driver.port_tx = GPIO_PORT_P2;
+    tx_driver.pin_tx = GPIO_PIN6;
+    tx_driver.tari = TARI;
+
+    // Decoder Driver
+    decoder_driver rx_driver;
+    rx_driver.port_rx = GPIO_PORT_P4;
+    rx_driver.pin_rx = GPIO_PIN2;
+    rx_driver.tari = TARI;
+    rx_driver.timeout = COMMUNICATION_TIMEOUT;
+
     unsigned int n = 0;
     //unsigned short random_number = rn16_generate();
     __delay_cycles(10000000);
@@ -122,6 +135,9 @@ int main(void)
     unsigned char ccr2;
     int comm_error = 0;
 
+
+    
+
     crc_16_ccitt_init();
     COMMUNICATION_STATE = READY;
     while (1)
@@ -132,7 +148,7 @@ int main(void)
 
 
             case READY:
-                comm_error = fm0_decoder(TARI, &query_response, &query_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                comm_error = fm0_decoder(&query_response, &query_response_size, rx_driver);
                 if(comm_error){
                     COMMUNICATION_STATE = ERROR;
                 }
@@ -141,7 +157,7 @@ int main(void)
                 if(res) {
                     _rn16.value = rn16_generate();
                     _rn16.size = 16;
-                    fm0_encoder(_rn16.value, _rn16.size, TARI, GPIO_PIN6, GPIO_PORT_P2);
+                    fm0_encoder(_rn16.value, _rn16.size, tx_driver);
                     COMMUNICATION_STATE = REPLY;
                 }
                 else {
@@ -155,7 +171,7 @@ int main(void)
                 break;
 
             case REPLY:
-                comm_error = fm0_decoder(TARI, &ack_response, &ack_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                comm_error = fm0_decoder( &ack_response, &ack_response_size, rx_driver);
                 if (comm_error)
                     COMMUNICATION_STATE = ERROR;
                 else
@@ -166,7 +182,7 @@ int main(void)
                         COMMUNICATION_STATE = ACKNOWLEDGED;
                         rn16_2.value = rn16_generate();
                         rn16_2.size = 16;
-                        fm0_encoder(rn16_2.value, rn16_2.size, TARI, GPIO_PIN6, GPIO_PORT_P2);
+                        fm0_encoder(rn16_2.value, rn16_2.size, tx_driver);
                     }
                     else
                     {
@@ -175,7 +191,7 @@ int main(void)
                 }
                 break;
             case ACKNOWLEDGED:
-                comm_error = fm0_decoder(TARI, &req_rn_response, &req_rn_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                comm_error = fm0_decoder( &req_rn_response, &req_rn_response_size, rx_driver);
                 if (comm_error)
                     COMMUNICATION_STATE = ERROR;
                 else
@@ -186,7 +202,7 @@ int main(void)
                         COMMUNICATION_STATE = OPEN;
                         handle.value = rn16_generate();
                         handle.size = 16;
-                        fm0_encoder(handle.value, handle.size, TARI, GPIO_PIN6, GPIO_PORT_P2);
+                        fm0_encoder(handle.value, handle.size, tx_driver);
                     }
                     else
                     {
@@ -195,7 +211,7 @@ int main(void)
                 }
                 break;
             case OPEN:
-                comm_error = fm0_decoder(TARI, &command_response, &command_response_size, GPIO_PIN2, GPIO_PORT_P4, COMMUNICATION_TIMEOUT);
+                comm_error = fm0_decoder( &command_response, &command_response_size, rx_driver);
                 if (comm_error)
                     COMMUNICATION_STATE = ERROR;
                 else{
@@ -289,14 +305,15 @@ void Init_Clock()
 #pragma vector = PORT4_VECTOR
 __interrupt void PIN_RX_ISR(void)
 {
-    //GPIO_disableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
     READING = 1;
     reading_timer = dt;
     dt = 0;
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
-    //GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);
 }
 
+/* 
+ * Timer Interrupt 
+ */
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void myTimerISR(void)
 {
