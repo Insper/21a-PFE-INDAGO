@@ -17,6 +17,7 @@ extern volatile unsigned int dt;
 extern volatile unsigned int reading_timer;
 extern volatile unsigned int delta_time;
 
-int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver driver);
+int fm0_decoder(unsigned long long *payload, unsigned int *n,
+                decoder_driver driver);
 
 #endif /* FM0_DECODER_H */

@@ -55,14 +55,7 @@ volatile unsigned int delta_time = 0;
 
 enum
 {
-    READY,
-    ARBITRATE,
-    REPLY,
-    ACKNOWLEDGED,
-    OPEN,
-    SECURED,
-    KILLED,
-    ERROR,
+    READY, ARBITRATE, REPLY, ACKNOWLEDGED, OPEN, SECURED, KILLED, ERROR,
 } COMMUNICATION_STATE;
 
 #if defined(__IAR_SYSTEMS_ICC__)
@@ -135,102 +128,107 @@ int main(void)
     unsigned char ccr2;
     int comm_error = 0;
 
-
-    
-
     crc_16_ccitt_init();
     COMMUNICATION_STATE = READY;
     while (1)
     {
 
         switch (COMMUNICATION_STATE)
-        {   
+        {
 
+        case READY:
+            comm_error = fm0_decoder(&query_response, &query_response_size,
+                                     rx_driver);
+            if (comm_error)
+            {
+                COMMUNICATION_STATE = ERROR;
+            }
 
-            case READY:
-                comm_error = fm0_decoder(&query_response, &query_response_size, rx_driver);
-                if(comm_error){
-                    COMMUNICATION_STATE = ERROR;
+            res = query_validate(&query_response, query_response_size);
+            if (res)
+            {
+                _rn16.value = rn16_generate();
+                _rn16.size = 16;
+                fm0_encoder(_rn16.value, _rn16.size, tx_driver);
+                COMMUNICATION_STATE = REPLY;
+            }
+            else
+            {
+                COMMUNICATION_STATE = ERROR;
+            }
+
+            break;
+
+        case ARBITRATE:
+            COMMUNICATION_STATE = READY;
+            break;
+
+        case REPLY:
+            comm_error = fm0_decoder(&ack_response, &ack_response_size,
+                                     rx_driver);
+            if (comm_error)
+                COMMUNICATION_STATE = ERROR;
+            else
+            {
+                res = ack_validate(&ack_response, ack_response_size);
+                if (res)
+                {
+                    COMMUNICATION_STATE = ACKNOWLEDGED;
+                    rn16_2.value = rn16_generate();
+                    rn16_2.size = 16;
+                    fm0_encoder(rn16_2.value, rn16_2.size, tx_driver);
                 }
-
-                res = query_validate(&query_response, query_response_size);
-                if(res) {
-                    _rn16.value = rn16_generate();
-                    _rn16.size = 16;
-                    fm0_encoder(_rn16.value, _rn16.size, tx_driver);
-                    COMMUNICATION_STATE = REPLY;
-                }
-                else {
-                    COMMUNICATION_STATE = ERROR;
-                }
-
-                break;
-
-            case ARBITRATE:
-                COMMUNICATION_STATE = READY;
-                break;
-
-            case REPLY:
-                comm_error = fm0_decoder( &ack_response, &ack_response_size, rx_driver);
-                if (comm_error)
-                    COMMUNICATION_STATE = ERROR;
                 else
                 {
-                    res = ack_validate(&ack_response, ack_response_size);
-                    if (res)
-                    {
-                        COMMUNICATION_STATE = ACKNOWLEDGED;
-                        rn16_2.value = rn16_generate();
-                        rn16_2.size = 16;
-                        fm0_encoder(rn16_2.value, rn16_2.size, tx_driver);
-                    }
-                    else
-                    {
-                        COMMUNICATION_STATE = ERROR;
-                    }
-                }
-                break;
-            case ACKNOWLEDGED:
-                comm_error = fm0_decoder( &req_rn_response, &req_rn_response_size, rx_driver);
-                if (comm_error)
                     COMMUNICATION_STATE = ERROR;
+                }
+            }
+            break;
+        case ACKNOWLEDGED:
+            comm_error = fm0_decoder(&req_rn_response, &req_rn_response_size,
+                                     rx_driver);
+            if (comm_error)
+                COMMUNICATION_STATE = ERROR;
+            else
+            {
+                res = req_rn_validate(&req_rn_response, req_rn_response_size);
+                if (res)
+                {
+                    COMMUNICATION_STATE = OPEN;
+                    handle.value = rn16_generate();
+                    handle.size = 16;
+                    fm0_encoder(handle.value, handle.size, tx_driver);
+                }
                 else
                 {
-                    res = req_rn_validate(&req_rn_response, req_rn_response_size);
-                    if (res)
-                    {
-                        COMMUNICATION_STATE = OPEN;
-                        handle.value = rn16_generate();
-                        handle.size = 16;
-                        fm0_encoder(handle.value, handle.size, tx_driver);
-                    }
-                    else
-                    {
-                        COMMUNICATION_STATE = ERROR;
-                    }
-                }
-                break;
-            case OPEN:
-                comm_error = fm0_decoder( &command_response, &command_response_size, rx_driver);
-                if (comm_error)
                     COMMUNICATION_STATE = ERROR;
-                else{
-                    res = nak_validate(&command_response, command_response_size);
-                    if(res){
-                        COMMUNICATION_STATE = ARBITRATE;
-
-                    }
-                    else {
-                        COMMUNICATION_STATE = ERROR;
-                    }
-                    
+                }
+            }
+            break;
+        case OPEN:
+            comm_error = fm0_decoder(&command_response, &command_response_size,
+                                     rx_driver);
+            if (comm_error)
+                COMMUNICATION_STATE = ERROR;
+            else
+            {
+                res = nak_validate(&command_response, command_response_size);
+                if (res)
+                {
+                    COMMUNICATION_STATE = ARBITRATE;
 
                 }
-                
-                break;
-            case ERROR:
-                COMMUNICATION_STATE = READY;
-                break;
+                else
+                {
+                    COMMUNICATION_STATE = ERROR;
+                }
+
+            }
+
+            break;
+        case ERROR:
+            COMMUNICATION_STATE = READY;
+            break;
         }
     }
 }
@@ -253,20 +251,20 @@ void Init_GPIO()
     GPIO_setOutputLowOnPin(GPIO_PORT_P2, GPIO_PIN0);
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0);
     GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P2, GPIO_PIN1,
-                                               GPIO_SECONDARY_MODULE_FUNCTION);
+    GPIO_SECONDARY_MODULE_FUNCTION);
 
     // Saet PJ.4 nd PJ.5 as Primary Module Function Input, LFXT.
     GPIO_setAsPeripheralModuleFunctionInputPin(
-        GPIO_PORT_PJ,
-        GPIO_PIN4 + GPIO_PIN5,
-        GPIO_PRIMARY_MODULE_FUNCTION);
+    GPIO_PORT_PJ,
+                                               GPIO_PIN4 + GPIO_PIN5,
+                                               GPIO_PRIMARY_MODULE_FUNCTION);
 
     // Disable the GPIO power-on default high-impedance mode
     // to activate previously configured port settings
     PMM_unlockLPM5();
 
     GPIO_selectInterruptEdge(GPIO_PORT_P4, GPIO_PIN2,
-                             GPIO_LOW_TO_HIGH_TRANSITION);
+    GPIO_LOW_TO_HIGH_TRANSITION);
     GPIO_setAsInputPinWithPullUpResistor(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_clearInterrupt(GPIO_PORT_P4, GPIO_PIN2);
     GPIO_enableInterrupt(GPIO_PORT_P4, GPIO_PIN2);

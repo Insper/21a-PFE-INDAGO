@@ -87,7 +87,7 @@ void timer_callback(uint_least8_t index)
 /*
  *  ======== mainThread ========
  */
-void *mainThread(void *arg0)
+void* mainThread(void *arg0)
 {
     /* Call driver init functions */
     GPIO_init();
@@ -107,7 +107,8 @@ void *mainThread(void *arg0)
     rx_driver.timeout = COMMUNICATION_TIMEOUT;
 
     GPIO_setConfig(tx_driver.pin_tx, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
-    GPIO_setConfig(rx_driver.pin_rx, GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_BOTH_EDGES);
+    GPIO_setConfig(rx_driver.pin_rx,
+                   GPIO_CFG_IN_PU | GPIO_CFG_IN_INT_BOTH_EDGES);
 
     GPIO_setCallback(rx_driver.pin_rx, rx_callback);
 
@@ -164,7 +165,8 @@ void *mainThread(void *arg0)
             break;
 
         case receive_rn16:
-            comm_error = fm0_decoder(&query_response, &query_response_size, rx_driver);
+            comm_error = fm0_decoder(&query_response, &query_response_size,
+                                     rx_driver);
             if (comm_error || query_response_size != 16)
                 COMMUNICATION_STATE = error;
             else
@@ -183,7 +185,8 @@ void *mainThread(void *arg0)
             break;
 
         case receive_pc:
-            comm_error = fm0_decoder(&ack_response, &ack_response_size, rx_driver);
+            comm_error = fm0_decoder(&ack_response, &ack_response_size,
+                                     rx_driver);
             if (comm_error)
                 COMMUNICATION_STATE = error;
             else
@@ -199,7 +202,8 @@ void *mainThread(void *arg0)
             break;
 
         case receive_handle:
-            comm_error = fm0_decoder(&req_rn_response, &req_rn_response_size, rx_driver);
+            comm_error = fm0_decoder(&req_rn_response, &req_rn_response_size,
+                                     rx_driver);
             if (comm_error)
                 COMMUNICATION_STATE = error;
             else

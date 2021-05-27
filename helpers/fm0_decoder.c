@@ -2,15 +2,8 @@
 
 enum
 {
-    start,
-    read,
-    um,
-    read_zero,
-    zero,
-    erro,
-    fim
+    start, read, um, read_zero, zero, erro, fim
 } state;
-
 
 // /************************************************************************/
 // /* functions                                                            */
@@ -22,7 +15,8 @@ enum
 //  *  @param      n       package size
 //  *  @param      driver  RX driver
 //  */
-int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver driver)
+int fm0_decoder(unsigned long long *payload, unsigned int *n,
+                decoder_driver driver)
 {
 
     int c_bit = 0;
@@ -39,7 +33,7 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
 
     READING = 0;
     delta_time = 0;
-    dt=0;
+    dt = 0;
     while (1)
     {
         switch (state)
@@ -50,7 +44,9 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
                 READING = 0;
                 edge = _change_edge(edge, driver.pin_rx, driver.port_rx);
                 state = read;
-            } else if (dt>driver.timeout) {
+            }
+            else if (dt > driver.timeout)
+            {
                 state = erro;
             }
             break;
@@ -59,11 +55,13 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
             {
                 READING = 0;
                 edge = _change_edge(edge, driver.pin_rx, driver.port_rx);
-                if ((reading_timer * 100 > (0.65 * driver.tari)) && (reading_timer * 100 < (1.35 * driver.tari)))
+                if ((reading_timer * 100 > (0.65 * driver.tari))
+                        && (reading_timer * 100 < (1.35 * driver.tari)))
                 {
                     state = um;
                 }
-                else if (reading_timer * 100 > 0.35 * driver.tari && reading_timer * 100 < 0.65 * driver.tari)
+                else if (reading_timer * 100 > 0.35 * driver.tari
+                        && reading_timer * 100 < 0.65 * driver.tari)
                 {
                     state = read_zero;
                 }
@@ -94,7 +92,8 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
                 READING = 0;
                 edge = _change_edge(edge, driver.pin_rx, driver.port_rx);
                 delta_time = reading_timer - dt;
-                if (reading_timer * 100 > 0.35 * driver.tari && reading_timer * 100 < 0.65 * driver.tari)
+                if (reading_timer * 100 > 0.35 * driver.tari
+                        && reading_timer * 100 < 0.65 * driver.tari)
                 {
                     state = zero;
                 }

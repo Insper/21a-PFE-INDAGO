@@ -87,7 +87,7 @@ crc16 crc_16_ccitt(const unsigned long message, int n_bytes)
     // Divide the message by the polynomial, a byte at a time.
     for (byte = 0; byte < n_bytes; ++byte)
     {
-        tmp = (message >> (byte*8)) & 0b11111111;
+        tmp = (message >> (byte * 8)) & 0b11111111;
         data = tmp ^ (remainder >> 8);
         remainder = crc_table[data] ^ (remainder << 8);
     }
