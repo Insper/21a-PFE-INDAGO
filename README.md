@@ -4,7 +4,7 @@
 * [Integrantes](#integrantes)
 * [Professor Mentor](#professor-mentor)
 * [Introdução](#introdução)
-* [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04)
+* [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20-.04)
 * [Instalando CCS no Windows 10](#instalando-ccs-no-windows-10)
 * [Importando Projetos para o CCS](#importando-projetos-para-o-ccs)
 * [Compilando e Programando a Placa](#compilando-e-programando-a-placa)
@@ -74,14 +74,11 @@ O projeto esta importado! Agora basta compilar e programar sua placa.
 
 ### Compilando e Programando a Placa
 
-Para programar a placa é muito simples. Por padrão, na barra de ferramentas na parte superior do CCS deve ter um desenho em formato de martelo. Basta abrir algum arquivo do projeto que deseja compilar e clicar neste simbolo.
-
-![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/images/martelo.png)
+Para programar a placa é muito simples. Por padrão, na barra de ferramentas na parte superior do CCS deve ter um desenho em formato de martelo ![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/images/martelo.png). Basta abrir qualquer arquivo do projeto que deseja compilar e clicar neste simbolo.
 
 Caso tenho algum erro ou aviso de compilação eles aparecerão na aba `Problems` do CCS.
 
 ![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/images/problemsCCS.png)
 
-Uma vez que o projeto esta compilado e sem erros (avisos não impedem a programação), basta programar a placa. Para isso, no mesmo local do martelo de compilação haverá um desenho de uma pasta com arquivo, que ao passar o mouse em cima aparecerá `Flash`. Com a placa ja conectada em seu computador, basta clicar nele que deve reconhecer a placa imediantamente e em seguida programá-la.
-
-![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/images/programando.png)
+Uma vez que o projeto esta compilado e sem erros (avisos não impedem a programação), basta programar a placa. Para isso, no mesmo local do martelo de compilação haverá um desenho de uma pasta com arquivo ![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/images/programando.png),
+ que ao passar o mouse em cima aparecerá `Flash`. Com a placa ja conectada em seu computador, basta clicar nele que deve reconhecer a placa imediantamente e em seguida programá-la.
