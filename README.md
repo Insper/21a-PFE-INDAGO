@@ -4,7 +4,7 @@
 * [Integrantes](#integrantes)
 * [Professor Mentor](#professor-mentor)
 * [Introdução](#introdução)
-* [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20-.04)
+* [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20-.-04)
 * [Instalando CCS no Windows 10](#instalando-ccs-no-windows-10)
 * [Importando Projetos para o CCS](#importando-projetos-para-o-ccs)
 * [Compilando e Programando a Placa](#compilando-e-programando-a-placa)
