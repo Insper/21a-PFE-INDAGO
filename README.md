@@ -62,7 +62,7 @@ Em `Work with:` Selecione `--All Available Sites--` e na barra de seleção des�
 
 ### Importando Projetos para o CCS
 
-Com o CCS aberto, clique com o botão direito dentro do `Project Explorer` e selecione `Import > CCS Projects`, conforme a figura abaixo.
+Com o CCS aberto, clique com o botão direito do mouse dentro do `Project Explorer` e selecione `Import > CCS Projects`, conforme a figura abaixo.
 
 ![Indisponível](https://github.com/Insper/21a-PFE-INDAGO/blob/master/images/importCCS.png)
 
