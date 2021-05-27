@@ -30,7 +30,7 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
     int edge = 0; // 0: high to low
                   // 1: low  to high
 
-    int veioDoUm = 0;
+    int from_one = 0;
 
     edge = _GPIO_read(driver.pin_rx, driver.port_rx);
     edge = _change_edge(!edge, driver.pin_rx, driver.port_rx);
@@ -38,7 +38,7 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
     int state = start;
 
     READING = 0;
-    resultante_tempo = 0;
+    delta_time = 0;
     dt=0;
     while (1)
     {
@@ -77,7 +77,7 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
             // fim da transmissao ou erro?
             if (dt * 100 > 6 * driver.tari)
             {
-                if (veioDoUm == 1)
+                if (from_one == 1)
                 {
                     state = fim;
                 }
@@ -93,7 +93,7 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
             {
                 READING = 0;
                 edge = _change_edge(edge, driver.pin_rx, driver.port_rx);
-                resultante_tempo = reading_timer - dt;
+                delta_time = reading_timer - dt;
                 if (reading_timer * 100 > 0.35 * driver.tari && reading_timer * 100 < 0.65 * driver.tari)
                 {
                     state = zero;
@@ -108,13 +108,13 @@ int fm0_decoder(unsigned long long *payload, unsigned int *n, decoder_driver dri
             *payload = (*payload << 1) | 0x01;
             c_bit++;
             state = read;
-            veioDoUm = 1;
+            from_one = 1;
             break;
         case zero:
             *payload = (*payload << 1);
             c_bit++;
             state = read;
-            veioDoUm = 0;
+            from_one = 0;
             break;
         case fim:
             *payload = (*payload >> 1);

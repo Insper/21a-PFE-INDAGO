@@ -53,7 +53,7 @@
 volatile char READING = 0;
 volatile unsigned int dt = 0;
 volatile unsigned int reading_timer = 0;
-volatile unsigned int resultante_tempo = 0;
+volatile unsigned int delta_time = 0;
 
 Timer_Handle timer0;
 
