@@ -18,16 +18,6 @@ void _usleep(unsigned int time)
     }
 }
 
-inline void _usleep_tari(void)
-{
-    // TODO: Criar nossa propria funcao
-    asm(" NOP");
-    asm(" NOP");
-    asm(" NOP");
-    asm(" NOP");
-    asm(" NOP");
-}
-
 unsigned int _GPIO_read(unsigned short pin, unsigned char port)
 {
     return GPIO_getInputPinValue(port, pin);
