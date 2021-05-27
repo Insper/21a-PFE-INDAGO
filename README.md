@@ -84,4 +84,4 @@ Caso tenho algum erro ou aviso de compilação eles aparecerão na aba `Problems
 
 Uma vez que o projeto esta compilado e sem erros (avisos não impedem a programação), basta programar a placa. Para isso, no mesmo local do martelo de compilação haverá um desenho de uma pasta com arquivo, que ao passar o mouse em cima aparecerá `Flash`. Com a placa ja conectada em seu computador, basta clicar nele que deve reconhecer a placa imediantamente e em seguida programá-la.
 
-![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/imagens/programando.png)
+![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/images/programando.png)
