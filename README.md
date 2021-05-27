@@ -5,6 +5,9 @@
 * [Professor Mentor](#professor-mentor)
 * [Introdução](#introdução)
 * [Instalando CCS no Ubuntu 20.04](#instalando-ccs-no-ubuntu-20.04)
+* [Instalando CCS no Windows 10](#instalando-ccs-no-windows-10)
+* [Importando Projetos para o CCS](#importando-projetos-para-o-ccs)
+* [Compilando e Programando a Placa](#compilando-e-programando-a-placa)
 
 ### Integrantes
 * [André Ejzenmesser](https://github.com/decoejz)
@@ -57,3 +60,28 @@ Ao finalizar, abra o aplicativo e na aba superior clique em `Help` > `Install Ne
 
 Em `Work with:` Selecione `--All Available Sites--` e na barra de seleção desça até encontrar `TI Compiler Tools` e marque a opção `MSP430 Compiler Tools` cuja versão for equivalente a `4.3.8`. Aguarde a instalação e ao finalizar, reinicie o programa.
 
+### Importando Projetos para o CCS
+
+Com o CCS aberto, clique com o botão direito dentro do `Project Explorer` e selecione `Import > CCS Projects`, conforme a figura abaixo.
+
+![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/imagens/importCCS.png)
+
+Uma nova janela se abrirá. Clique em `Browse...` e selecione o projeto que deseja abrir. Verifique ainda nessa janela que o projeto correto esta selecionado. Deixe marcado a opção para importar juntos projetos dependentes para evitar problemas de compilação e escrita. O nome dessa opção é `Automatically import referenced projects found in same search-directory`. Por fim clique em `Finish`.
+
+![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/imagens/importWindowCCS.png)
+
+O projeto esta importado! Agora basta compilar e programar sua placa.
+
+### Compilando e Programando a Placa
+
+Para programar a placa é muito simples. Por padrão, na barra de ferramentas na parte superior do CCS deve ter um desenho em formato de martelo. Basta abrir algum arquivo do projeto que deseja compilar e clicar neste simbolo.
+
+![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/imagens/martelo.png)
+
+Caso tenho algum erro ou aviso de compilação eles aparecerão na aba `Problems` do CCS.
+
+![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/imagens/problemsCCS.png)
+
+Uma vez que o projeto esta compilado e sem erros (avisos não impedem a programação), basta programar a placa. Para isso, no mesmo local do martelo de compilação haverá um desenho de uma pasta com arquivo, que ao passar o mouse em cima aparecerá `Flash`. Com a placa ja conectada em seu computador, basta clicar nele que deve reconhecer a placa imediantamente e em seguida programá-la.
+
+![Indisponível](https://github.com/insper/21a-PFE-INDAGO/blob/master/imagens/programando.png)
